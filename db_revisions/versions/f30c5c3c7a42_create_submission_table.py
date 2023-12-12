@@ -14,7 +14,7 @@ from db_revisions.utils import table_exists
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f30c5c3c7a42'
+revision: str = "f30c5c3c7a42"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

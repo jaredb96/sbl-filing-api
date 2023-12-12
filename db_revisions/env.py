@@ -85,7 +85,7 @@ def run_migrations_online() -> None:
 
     """
     connectable = context.config.attributes.get("connection", None)
-    
+
     if connectable is None:
         connectable = engine_from_config(
             config.get_section(config.config_ini_section, {}),
