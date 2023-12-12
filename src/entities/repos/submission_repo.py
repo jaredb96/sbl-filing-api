@@ -15,6 +15,7 @@ async def get_submission(session: AsyncSession, submission_id: str) -> Submissio
         )
         return await session.scalar(stmt)
 
+
 # I was thinking this would be called after calling data_validator.create_schemas.validate()
 # which returns a boolean, DataFrame tuple. The DataFrame represents the results of validation.
 # Not sure if we'll already have the submission info in a DTO at this time (from the endpoint call)
