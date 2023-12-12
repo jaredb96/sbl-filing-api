@@ -43,7 +43,7 @@ class ValidationResultDAO(AuditMixin, Base):
 class RecordDAO(AuditMixin, Base):
     __tablename__ = "validation_result_record"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    result_id: Mapped[str] = mapped_column(ForeignKey("validation_results.id"))
+    result_id: Mapped[str] = mapped_column(ForeignKey("validation_result.id"))
     result: Mapped["ValidationResultDAO"] = relationship(back_populates="records")  # if we care about bidirectional
     record: Mapped[int]
     data: Mapped[str]
