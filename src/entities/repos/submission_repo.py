@@ -15,7 +15,11 @@ async def get_submission(session: AsyncSession, submission_id: str) -> Submissio
         )
         return await session.scalar(stmt)
 
-
+# I was thinking this would be called after calling data_validator.create_schemas.validate()
+# which returns a boolean, DataFrame tuple. The DataFrame represents the results of validation.
+# Not sure if we'll already have the submission info in a DTO at this time (from the endpoint call)
+# so we may be able to change the submission_id, submitter, and lei into an object versus individual
+# data fields.
 async def add_submission(
     session: AsyncSession, submission_id: str, submitter: str, lei: str, results: pd.DataFrame
 ) -> SubmissionDAO:

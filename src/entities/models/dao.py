@@ -30,7 +30,7 @@ class SubmissionDAO(AuditMixin, Base):
 
 
 class ValidationResultDAO(AuditMixin, Base):
-    __tablename__ = "validation_results"
+    __tablename__ = "validation_result"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     submission_id: Mapped[str] = mapped_column(ForeignKey("submission.submission_id"))
     submission: Mapped["SubmissionDAO"] = relationship(back_populates="results")  # if we care about bidirectional
