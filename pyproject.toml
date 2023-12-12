@@ -48,6 +48,9 @@ addopts = [
   "--strict-markers",
   "-rfE",
 ]
+env = [
+  "INST_DB_SCHEMA=main"
+]
 testpaths = ["tests"]
 
 [tool.black]
