@@ -5,17 +5,8 @@ __all__ = [
     "RecordDAO",
     "RecordDTO",
     "ValidationResultDTO",
-    "SubmissionDTO"
+    "SubmissionDTO",
 ]
 
-from .dao import (
-    Base,
-    SubmissionDAO,
-    ValidationResultDAO,
-    RecordDAO
-)
-from .dto import (
-    RecordDTO,
-    ValidationResultDTO,
-    SubmissionDTO
-)
+from .dao import Base, SubmissionDAO, ValidationResultDAO, RecordDAO
+from .dto import RecordDTO, ValidationResultDTO, SubmissionDTO

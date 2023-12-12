@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
-from sqlalchemy import select, func
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from entities.models import SubmissionDAO, ValidationResultDAO, RecordDAO
 from entities.repos import submission_repo as repo

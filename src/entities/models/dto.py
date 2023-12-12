@@ -1,6 +1,5 @@
-from typing import List, Dict, Any, Set
+from typing import List
 from pydantic import BaseModel, ConfigDict
-from starlette.authentication import BaseUser
 
 
 class RecordDTO(BaseModel):
