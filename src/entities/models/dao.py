@@ -69,7 +69,7 @@ class RecordDAO(AuditMixin, Base):
     field_name: Mapped[str]
     field_value: Mapped[str]
 
-class FilingPeriod(AuditMixin, Base):
+class FilingPeriodDAO(AuditMixin, Base):
     __tablename__ = "filing_period"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str]
@@ -78,7 +78,7 @@ class FilingPeriod(AuditMixin, Base):
     due: Mapped[datetime]
     filing_type: Mapped[FilingType] = mapped_column(Enum(FilingType))
 
-class Filing(AuditMixin, Base):
+class FilingDAO(AuditMixin, Base):
     __tablename__ = "filing"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     lei: Mapped[str]
