@@ -32,32 +32,65 @@ class TestSubmissionRepo:
         )
         transaction_session.add(filing_period)
 
-        filing = FilingDAO(
+        filing1 = FilingDAO(
             lei="1234567890", state=FilingState.FILING_STARTED, institution_snapshot_id="Snapshot-1", filing_period=1
         )
-        transaction_session.add(filing)
+        filing2 = FilingDAO(
+            lei="ABCDEFGHIJ", state=FilingState.FILING_STARTED, institution_snapshot_id="Snapshot-1", filing_period=1
+        )
+        transaction_session.add(filing1)
+        transaction_session.add(filing2)
 
-        submission = SubmissionDAO(
-            submitter="test@cfpb.gov",
+        submission1 = SubmissionDAO(
+            submitter="test1@cfpb.gov",
             filing=1,
             state=SubmissionState.SUBMISSION_UPLOADED,
             validation_ruleset_version="v1",
         )
-        transaction_session.add(submission)
+        submission2 = SubmissionDAO(
+            submitter="test2@cfpb.gov",
+            filing=2,
+            state=SubmissionState.SUBMISSION_UPLOADED,
+            validation_ruleset_version="v1",
+        )
+        submission3 = SubmissionDAO(
+            submitter="test2@cfpb.gov",
+            filing=2,
+            state=SubmissionState.SUBMISSION_UPLOADED,
+            validation_ruleset_version="v1",
+        )
+        transaction_session.add(submission1)
+        transaction_session.add(submission2)
+        transaction_session.add(submission3)
 
         await transaction_session.commit()
 
     async def test_get_submission(self, query_session: AsyncSession):
         res = await repo.get_submission(query_session, submission_id=1)
         assert res.submission_id == 1
-        assert res.submitter == "test@cfpb.gov"
+        assert res.submitter == "test1@cfpb.gov"
         assert res.filing == 1
         assert res.state == SubmissionState.SUBMISSION_UPLOADED
         assert res.validation_ruleset_version == "v1"
 
+    async def test_get_submissions(self, query_session: AsyncSession):
+        res = await repo.get_submissions(query_session)
+        assert len(res) == 3
+        assert {1, 2, 3} == set([s.submission_id for s in res])
+        assert res[0].submitter == "test1@cfpb.gov"
+        assert res[1].filing == 2
+        assert res[2].state == SubmissionState.SUBMISSION_UPLOADED
+
+        res = await repo.get_submissions(query_session, filing_id=2)
+        assert len(res) == 2
+        assert {2, 3} == set([s.submission_id for s in res])
+        assert {"test2@cfpb.gov"} == set([s.submitter for s in res])
+        assert {2} == set([s.filing for s in res])
+        assert {SubmissionState.SUBMISSION_UPLOADED} == set([s.state for s in res])
+
     async def test_add_submission(self, transaction_session: AsyncSession):
         res = await repo.upsert_submission(transaction_session, SubmissionDTO(submitter="test@cfpb.gov", filing=1))
-        assert res.submission_id == 2
+        assert res.submission_id == 4
         assert res.submitter == "test@cfpb.gov"
         assert res.filing == 1
         assert res.state == SubmissionState.SUBMISSION_UPLOADED
@@ -96,7 +129,7 @@ class TestSubmissionRepo:
         updated_sub = SubmissionDAO(
             submission_id=1,
             validation_json={},
-            submitter="test@cfpb.gov",
+            submitter="test1@cfpb.gov",
             filing=1,
             state=SubmissionState.SUBMISSION_SIGNED,
             validation_ruleset_version="v1",

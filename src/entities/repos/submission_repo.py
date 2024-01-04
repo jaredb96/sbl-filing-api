@@ -1,7 +1,18 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from typing import List
+
 from entities.models import SubmissionDAO, SubmissionDTO, SubmissionState
+
+
+async def get_submissions(session: AsyncSession, filing_id: int = None) -> List[SubmissionDAO]:
+    async with session.begin():
+        stmt = select(SubmissionDAO)
+        if filing_id:
+            stmt = stmt.filter(SubmissionDAO.filing == filing_id)
+        results = await session.scalars(stmt)
+        return results.all()
 
 
 async def get_submission(session: AsyncSession, submission_id: int) -> SubmissionDAO:
