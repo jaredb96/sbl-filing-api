@@ -1,5 +1,5 @@
+from .model_enums import FilingType, FilingState, SubmissionState
 from datetime import datetime
-from enum import Enum
 from typing import Any
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy import ForeignKey
@@ -8,25 +8,7 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.types import JSON
 
-
-class SubmissionState(Enum):
-    SUBMISSION_UPLOADED = 1
-    VALIDATION_IN_PROGRESS = 2
-    VALIDATION_WITH_ERRORS = 3
-    VALIDATION_WITH_WARNINGS = 4
-    VALIDATION_SUCCESSFUL = 5
-    SUBMISSION_SIGNED = 6
-
-
-class FilingState(Enum):
-    FILING_STARTED = 1
-    FILING_IN_PROGRESS = 2
-    FILING_COMPLETE = 3
-
-
-class FilingType(Enum):
-    TYPE_A = "Type_A"
-    TYPE_B = "Type_B"
+SQLFilingType = SAEnum(FilingType, name="filingtype", values_callable=lambda obj: [e.value for e in obj])
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -35,7 +17,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class SubmissionDAO(Base):
     __tablename__ = "submission"
-    submission_id: Mapped[int] = mapped_column(index=True, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(index=True, primary_key=True, autoincrement=True)
     submitter: Mapped[str]
     state: Mapped[SubmissionState] = mapped_column(SAEnum(SubmissionState))
     validation_ruleset_version: Mapped[str]
@@ -43,17 +25,17 @@ class SubmissionDAO(Base):
     filing: Mapped[str] = mapped_column(ForeignKey("filing.id"))
 
     def __str__(self):
-        return f"Submission ID: {self.submission_id}, Submitter: {self.submitter}, State: {self.state}, Ruleset: {self.validation_ruleset_version}, Filing: {self.filing}"
+        return f"Submission ID: {self.id}, Submitter: {self.submitter}, State: {self.state}, Ruleset: {self.validation_ruleset_version}, Filing: {self.filing}"
 
 
 class FilingPeriodDAO(Base):
     __tablename__ = "filing_period"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str]
-    start: Mapped[datetime]
-    end: Mapped[datetime]
+    start_period: Mapped[datetime]
+    end_period: Mapped[datetime]
     due: Mapped[datetime]
-    filing_type: Mapped[FilingType] = mapped_column(SAEnum(FilingType))
+    filing_type: Mapped[SQLFilingType] = mapped_column(SAEnum(FilingType))
 
 
 class FilingDAO(Base):
