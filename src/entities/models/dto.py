@@ -1,27 +1,36 @@
-from typing import List
+from datetime import datetime
+from typing import Dict, Any
 from pydantic import BaseModel, ConfigDict
-
-
-class RecordDTO(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    record: int
-    data: str
-
-
-class ValidationResultDTO(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    validation_id: str
-    field_name: str
-    severity: str
-    records: List[RecordDTO] = []
+from .model_enums import FilingType, FilingState, SubmissionState
 
 
 class SubmissionDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    submission_id: str
-    lei: str
+    id: int | None = None
     submitter: str
-    results: List[ValidationResultDTO] = []
+    state: SubmissionState | None = None
+    validation_ruleset_version: str | None = None
+    validation_json: Dict[str, Any] | None = None
+    filing: int
+
+
+class FilingDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    lei: str
+    state: FilingState
+    filing_period: int
+    institution_snapshot_id: str
+
+
+class FilingPeriodDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    name: str
+    start_period: datetime
+    end_period: datetime
+    due: datetime
+    filing_type: FilingType
