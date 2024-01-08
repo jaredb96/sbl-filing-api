@@ -15,8 +15,8 @@ from db_revisions.utils import table_exists
 from entities.models import FilingState
 
 # revision identifiers, used by Alembic.
-revision: str = '4659352bd865'
-down_revision: Union[str, None] = '5a775dd75356'
+revision: str = "4659352bd865"
+down_revision: Union[str, None] = "5a775dd75356"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -35,6 +35,7 @@ def upgrade() -> None:
                 ["filing_period.id"],
             ),
         )
-        
+
+
 def downgrade() -> None:
     op.drop_table("filing")

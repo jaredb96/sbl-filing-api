@@ -15,7 +15,7 @@ from entities.models import FilingType
 
 
 # revision identifiers, used by Alembic.
-revision: str = '5a775dd75356'
+revision: str = "5a775dd75356"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,8 +30,9 @@ def upgrade() -> None:
             sa.Column("start_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
             sa.Column("end_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
             sa.Column("due", sa.DateTime, server_default=sa.func.now(), nullable=False),
-            sa.Column("filing_type", sa.Enum(FilingType, name="filingtype"), server_default="MANUAL")
+            sa.Column("filing_type", sa.Enum(FilingType, name="filingtype"), server_default="MANUAL"),
         )
+
 
 def downgrade() -> None:
     op.drop_table("filing_period")

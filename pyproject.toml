@@ -49,7 +49,11 @@ addopts = [
   "-rfE",
 ]
 env = [
-  "INST_DB_SCHEMA=main"
+  "INST_DB_SCHEMA=main",
+  "INST_DB_USER=user",
+  "INST_DB_PWD=user",
+  "INST_DB_HOST=localhost:5432",
+  "INST_DB_NAME=filing"
 ]
 testpaths = ["tests"]
 
