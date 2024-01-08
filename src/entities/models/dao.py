@@ -8,9 +8,6 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.types import JSON
 
-SQLFilingType = SAEnum(FilingType, name="filingtype", values_callable=lambda obj: [e.value for e in obj])
-
-
 class Base(AsyncAttrs, DeclarativeBase):
     pass
 
@@ -35,7 +32,7 @@ class FilingPeriodDAO(Base):
     start_period: Mapped[datetime]
     end_period: Mapped[datetime]
     due: Mapped[datetime]
-    filing_type: Mapped[SQLFilingType] = mapped_column(SAEnum(FilingType))
+    filing_type: Mapped[FilingType] = mapped_column(SAEnum(FilingType))
 
 
 class FilingDAO(Base):
