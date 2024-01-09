@@ -36,6 +36,13 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 pythonpath = ["src"]
+env = [
+  "INST_DB_SCHEMA=main",
+  "INST_DB_USER=user",
+  "INST_DB_PWD=user",
+  "INST_DB_HOST=localhost",
+  "INST_DB_NAME=filing"
+]
 addopts = [
   "--cov-report=term-missing",
   "--cov-branch",
