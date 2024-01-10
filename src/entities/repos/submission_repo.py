@@ -56,8 +56,8 @@ async def add_submission(session: AsyncSession, submission: SubmissionDTO) -> Su
         return new_sub
 
 
-async def update_submission(submission: SubmissionDAO) -> SubmissionDAO:
-    session = await anext(get_session())
+async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSession = None) -> SubmissionDAO:
+    session = incoming_session if incoming_session else await anext(get_session())
     async with session.begin():
         try:
             new_sub = await session.merge(submission)

@@ -3,7 +3,7 @@ import pytest
 
 from datetime import datetime
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_scoped_session, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
 
 from entities.models import (
     SubmissionDAO,
@@ -20,15 +20,16 @@ from entities.repos import submission_repo as repo
 
 from pytest_mock import MockerFixture
 
-from asyncio import current_task
+from entities.engine import engine as entities_engine
 
 
 class TestSubmissionRepo:
     @pytest.fixture(scope="function", autouse=True)
     async def setup(
-        self,
-        transaction_session: AsyncSession,
+        self, transaction_session: AsyncSession, mocker: MockerFixture, session_generator: async_scoped_session
     ):
+        mocker.patch.object(entities_engine, "SessionLocal", return_value=session_generator)
+
         filing_period = FilingPeriodDAO(
             name="FilingPeriod2024",
             start_period=datetime.now(),
@@ -150,41 +151,40 @@ class TestSubmissionRepo:
         assert res.state == SubmissionState.SUBMISSION_UPLOADED
         assert res.validation_ruleset_version == "v1"
 
-    async def test_update_submission(
-        self, mocker: MockerFixture, transaction_session: AsyncSession, engine: AsyncEngine
-    ):
-        mock_generator1 = _generator_function(engine)
-        get_session_mock = mocker.patch("entities.repos.submission_repo.get_session")
-        get_session_mock.return_value = mock_generator1
-
-        res = await repo.add_submission(transaction_session, SubmissionDTO(submitter="test2@cfpb.gov", filing=2))
+    async def test_update_submission(self, session_generator: async_scoped_session):
+        async with session_generator() as add_session:
+            res = await repo.add_submission(add_session, SubmissionDTO(submitter="test2@cfpb.gov", filing=2))
 
         res.state = SubmissionState.VALIDATION_IN_PROGRESS
-
         res = await repo.update_submission(res)
-        stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 4)
-        query_session = await anext(_generator_function(engine))
-        new_res1 = await query_session.scalar(stmt)
-        assert new_res1.id == 4
-        assert new_res1.filing == 2
-        assert new_res1.state == SubmissionState.VALIDATION_IN_PROGRESS
 
-        mock_generator2 = _generator_function(engine)
-        get_session_mock = mocker.patch("entities.repos.submission_repo.get_session")
-        get_session_mock.return_value = mock_generator2
+        async def query_updated_dao():
+            async with session_generator() as search_session:
+                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 4)
+                new_res1 = await search_session.scalar(stmt)
+                assert new_res1.id == 4
+                assert new_res1.filing == 2
+                assert new_res1.state == SubmissionState.VALIDATION_IN_PROGRESS
+
+        await query_updated_dao()
 
         validation_json = self.get_error_json()
         res.validation_json = validation_json
         res.state = SubmissionState.VALIDATION_WITH_ERRORS
+        # to test passing in a session to the update_submission function
+        async with session_generator() as update_session:
+            res = await repo.update_submission(res, update_session)
 
-        res = await repo.update_submission(res)
-        stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 4)
-        query_session = await anext(_generator_function(engine))
-        new_res2 = await query_session.scalar(stmt)
-        assert new_res2.id == 4
-        assert new_res2.filing == 2
-        assert new_res2.state == SubmissionState.VALIDATION_WITH_ERRORS
-        assert new_res2.validation_json == validation_json
+        async def query_updated_dao():
+            async with session_generator() as search_session:
+                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 4)
+                new_res2 = await search_session.scalar(stmt)
+                assert new_res2.id == 4
+                assert new_res2.filing == 2
+                assert new_res2.state == SubmissionState.VALIDATION_WITH_ERRORS
+                assert new_res2.validation_json == validation_json
+
+        await query_updated_dao()
 
     def get_error_json(self):
         df_columns = [
@@ -227,15 +227,3 @@ class TestSubmissionRepo:
         ]
         error_df = pd.DataFrame(df_data, columns=df_columns)
         return error_df.to_json()
-
-
-# We have to do this here because pytest automatically returns the first object from an async_generator
-# if you pass that generator as a fixture.  Because we want to override the get_session function
-# in the engine, which returns an async_generator, we need this function to also return an async_generator
-async def _generator_function(engine):
-    gen_session = async_scoped_session(async_sessionmaker(engine, expire_on_commit=False), current_task)
-    session = gen_session()
-    try:
-        yield session
-    finally:
-        await session.close()
