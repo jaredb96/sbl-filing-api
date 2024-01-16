@@ -10,10 +10,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-from db_revisions.utils import table_exists
-from entities.models import FilingType
-
-
 # revision identifiers, used by Alembic.
 revision: str = "5a775dd75356"
 down_revision: Union[str, None] = None
@@ -22,16 +18,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    if not table_exists("filing_period"):
-        op.create_table(
-            "filing_period",
-            sa.Column("id", sa.INTEGER, primary_key=True, autoincrement=True),
-            sa.Column("name", sa.String, nullable=False),
-            sa.Column("start_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
-            sa.Column("end_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
-            sa.Column("due", sa.DateTime, server_default=sa.func.now(), nullable=False),
-            sa.Column("filing_type", sa.Enum(FilingType, name="filingtype"), server_default="MANUAL"),
-        )
+    op.create_table(
+        "filing_period",
+        sa.Column("id", sa.INTEGER, primary_key=True, autoincrement=True),
+        sa.Column("name", sa.String, nullable=False),
+        sa.Column("start_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
+        sa.Column("end_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
+        sa.Column("due", sa.DateTime, server_default=sa.func.now(), nullable=False),
+        sa.Column("filing_type", sa.Enum("MANUAL", name="filingtype"), server_default="MANUAL"),
+    )
 
 
 def downgrade() -> None:

@@ -10,10 +10,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-from db_revisions.utils import table_exists
-
-from entities.models import SubmissionState
-
 
 # revision identifiers, used by Alembic.
 revision: str = "f30c5c3c7a42"
@@ -23,20 +19,30 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    if not table_exists("submission"):
-        op.create_table(
-            "submission",
-            sa.Column("id", sa.INTEGER, primary_key=True, autoincrement=True),
-            sa.Column("submitter", sa.String, nullable=False),
-            sa.Column("state", sa.Enum(SubmissionState, name="submissionstate")),
-            sa.Column("validation_ruleset_version", sa.String, nullable=False),
-            sa.Column("validation_json", sa.JSON),
-            sa.Column("filing", sa.Integer),
-            sa.ForeignKeyConstraint(
-                ["filing"],
-                ["filing.id"],
+    op.create_table(
+        "submission",
+        sa.Column("id", sa.INTEGER, primary_key=True, autoincrement=True),
+        sa.Column("submitter", sa.String, nullable=False),
+        sa.Column(
+            "state",
+            sa.Enum(
+                "SUBMISSION_UPLOADED",
+                "VALIDATION_IN_PROGRESS",
+                "VALIDATION_WITH_ERRORS",
+                "VALIDATION_WITH_WARNINGS",
+                "VALIDATION_SUCCESSFUL",
+                "SUBMISSION_SIGNED",
+                name="submissionstate",
             ),
-        )
+        ),
+        sa.Column("validation_ruleset_version", sa.String, nullable=False),
+        sa.Column("validation_json", sa.JSON),
+        sa.Column("filing", sa.Integer),
+        sa.ForeignKeyConstraint(
+            ["filing"],
+            ["filing.id"],
+        ),
+    )
 
 
 def downgrade() -> None:
