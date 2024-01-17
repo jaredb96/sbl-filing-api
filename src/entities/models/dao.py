@@ -46,6 +46,7 @@ class FilingDAO(Base):
     institution_snapshot_id: Mapped[str]
     contact_info: Mapped[str]
 
+
 # Commenting out for now since we're just storing the results from the data-validator as JSON.
 # If we determine building the data structure for results as tables is needed, we can add these
 # back in.
