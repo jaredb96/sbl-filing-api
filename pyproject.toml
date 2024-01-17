@@ -18,6 +18,7 @@ regtech-api-commons = {git = "https://github.com/cfpb/regtech-api-commons.git"}
 regtech-data-validator = {git = "https://github.com/cfpb/regtech-data-validator.git"}
 python-multipart = "^0.0.6"
 boto3 = "^1.33.12"
+alembic = "^1.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
@@ -28,6 +29,7 @@ pytest-alembic = "^0.10.7"
 ruff = "^0.1.6"
 black = "^23.11.0"
 pytest-asyncio = "^0.23.2"
+aiosqlite = "^0.19.0"
 
 [build-system]
 requires = ["poetry-core"]
