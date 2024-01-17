@@ -22,7 +22,16 @@ def upgrade() -> None:
         "filing",
         sa.Column("id", sa.INTEGER, primary_key=True, autoincrement=True),
         sa.Column("lei", sa.String, nullable=False),
-        sa.Column("state", sa.Enum("FILING_STARTED", "FILING_IN_PROGRESS", "FILING_COMPLETE", name="filingstate")),
+        sa.Column(
+            "state",
+            sa.Enum(
+                "FILING_STARTED",
+                "FILING_INSTITUTION_APPROVED",
+                "FILING_IN_PROGRESS",
+                "FILING_COMPLETE",
+                name="filingstate",
+            ),
+        ),
         sa.Column("institution_snapshot_id", sa.String, nullable=False),
         sa.Column("filing_period", sa.Integer),
         sa.Column("contact_info", sa.String),

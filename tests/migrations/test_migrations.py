@@ -22,14 +22,20 @@ def test_migrations(alembic_runner: MigrationContext, alembic_engine: Engine):
     )
 
     assert "filing" in tables
-    assert {"id", "lei", "state", "institution_snapshot_id", "filing_period"} == set(
+    assert {"id", "lei", "state", "institution_snapshot_id", "filing_period", "contact_info"} == set(
         [c["name"] for c in inspector.get_columns("filing")]
     )
 
     assert "submission" in tables
-    assert {"id", "submitter", "state", "validation_ruleset_version", "validation_json", "filing"} == set(
-        [c["name"] for c in inspector.get_columns("submission")]
-    )
+    assert {
+        "id",
+        "submitter",
+        "state",
+        "validation_ruleset_version",
+        "validation_json",
+        "filing",
+        "confirmation_id",
+    } == set([c["name"] for c in inspector.get_columns("submission")])
 
     filing_fk = inspector.get_foreign_keys("filing")[0]
     assert (
