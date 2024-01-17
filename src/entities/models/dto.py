@@ -13,7 +13,7 @@ class SubmissionDTO(BaseModel):
     validation_ruleset_version: str | None = None
     validation_json: Dict[str, Any] | None = None
     filing: int
-    confirmation_number: str | None = None
+    confirmation_id: str | None = None
 
 
 class FilingDTO(BaseModel):

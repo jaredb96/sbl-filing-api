@@ -21,7 +21,7 @@ class SubmissionDAO(Base):
     validation_ruleset_version: Mapped[str]
     validation_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True)
     filing: Mapped[str] = mapped_column(ForeignKey("filing.id"))
-    confirmation_number: Mapped[str]
+    confirmation_id: Mapped[str] = mapped_column(nullable=True)
 
     def __str__(self):
         return f"Submission ID: {self.id}, Submitter: {self.submitter}, State: {self.state}, Ruleset: {self.validation_ruleset_version}, Filing: {self.filing}"

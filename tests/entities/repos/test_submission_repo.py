@@ -35,10 +35,18 @@ class TestSubmissionRepo:
         transaction_session.add(filing_period)
 
         filing1 = FilingDAO(
-            lei="1234567890", state=FilingState.FILING_STARTED, institution_snapshot_id="Snapshot-1", filing_period=1
+            lei="1234567890",
+            state=FilingState.FILING_STARTED,
+            institution_snapshot_id="Snapshot-1",
+            filing_period=1,
+            contact_info="contact@test.com",
         )
         filing2 = FilingDAO(
-            lei="ABCDEFGHIJ", state=FilingState.FILING_STARTED, institution_snapshot_id="Snapshot-1", filing_period=1
+            lei="ABCDEFGHIJ",
+            state=FilingState.FILING_STARTED,
+            institution_snapshot_id="Snapshot-1",
+            filing_period=1,
+            contact_info="contact@test.com",
         )
         transaction_session.add(filing1)
         transaction_session.add(filing2)
@@ -91,6 +99,7 @@ class TestSubmissionRepo:
             state=FilingState.FILING_IN_PROGRESS,
             institution_snapshot_id="Snapshot-1",
             filing_period=1,
+            contact_info="contact@test.com",
         )
         res = await repo.upsert_filing(transaction_session, new_filing)
         assert res.id == 3
@@ -103,6 +112,7 @@ class TestSubmissionRepo:
             state=FilingState.FILING_COMPLETE,
             institution_snapshot_id="Snapshot-1",
             filing_period=1,
+            contact_info="contact@test.com",
         )
         res = await repo.upsert_filing(transaction_session, mod_filing)
         assert res.id == 3
