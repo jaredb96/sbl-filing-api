@@ -22,9 +22,9 @@ def upgrade() -> None:
         "filing_period",
         sa.Column("id", sa.INTEGER, primary_key=True, autoincrement=True),
         sa.Column("name", sa.String, nullable=False),
-        sa.Column("start_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        sa.Column("end_period", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        sa.Column("due", sa.DateTime, server_default=sa.func.now(), nullable=False),
+        sa.Column("start_period", sa.DateTime, nullable=False),
+        sa.Column("end_period", sa.DateTime, nullable=False),
+        sa.Column("due", sa.DateTime, nullable=False),
         sa.Column("filing_type", sa.Enum("MANUAL", name="filingtype"), server_default="MANUAL"),
     )
 
