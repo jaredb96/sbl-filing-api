@@ -25,6 +25,7 @@ def upgrade() -> None:
         sa.Column("state", sa.Enum("FILING_STARTED", "FILING_IN_PROGRESS", "FILING_COMPLETE", name="filingstate")),
         sa.Column("institution_snapshot_id", sa.String, nullable=False),
         sa.Column("filing_period", sa.Integer),
+        sa.Column("contact_info", sa.String),
         sa.ForeignKeyConstraint(
             ["filing_period"],
             ["filing_period.id"],
