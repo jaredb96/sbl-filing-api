@@ -18,7 +18,7 @@ class SubmissionDAO(Base):
     id: Mapped[int] = mapped_column(index=True, primary_key=True, autoincrement=True)
     submitter: Mapped[str]
     state: Mapped[SubmissionState] = mapped_column(SAEnum(SubmissionState))
-    validation_ruleset_version: Mapped[str]
+    validation_ruleset_version: Mapped[str] = mapped_column(nullable=True)
     validation_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=True)
     filing: Mapped[str] = mapped_column(ForeignKey("filing.id"))
     confirmation_id: Mapped[str] = mapped_column(nullable=True)
@@ -44,7 +44,7 @@ class FilingDAO(Base):
     state: Mapped[FilingState] = mapped_column(SAEnum(FilingState))
     filing_period: Mapped[int] = mapped_column(ForeignKey("filing_period.id"))
     institution_snapshot_id: Mapped[str]
-    contact_info: Mapped[str]
+    contact_info: Mapped[str] = mapped_column(nullable=True)
 
 
 # Commenting out for now since we're just storing the results from the data-validator as JSON.
