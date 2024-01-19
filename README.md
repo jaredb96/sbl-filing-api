@@ -2,20 +2,21 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/cfpb/sbl-filing-api/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                                  |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|-------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| src/config.py                         |       26 |        0 |        8 |        1 |     97% |    10->14 |
-| src/entities/models/\_\_init\_\_.py   |        4 |        0 |        0 |        0 |    100% |           |
-| src/entities/models/dao.py            |       38 |        1 |        0 |        0 |     97% |        27 |
-| src/entities/models/dto.py            |       29 |        0 |        0 |        0 |    100% |           |
-| src/entities/models/model\_enums.py   |       15 |        0 |        0 |        0 |    100% |           |
-| src/main.py                           |        4 |        4 |        0 |        0 |      0% |       1-8 |
-| src/routers/\_\_init\_\_.py           |        2 |        2 |        0 |        0 |      0% |       1-3 |
-| src/routers/filing.py                 |       10 |       10 |        2 |        0 |      0% |      1-15 |
-| src/services/submission\_processor.py |        4 |        4 |        0 |        0 |      0% |       1-8 |
-|                             **TOTAL** |  **132** |   **21** |   **10** |    **1** | **83%** |           |
+| Name                                   |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
+|--------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
+| src/config.py                          |       26 |        0 |        8 |        1 |     97% |    10->14 |
+| src/entities/models/\_\_init\_\_.py    |        4 |        0 |        0 |        0 |    100% |           |
+| src/entities/models/dao.py             |       38 |        1 |        0 |        0 |     97% |        27 |
+| src/entities/models/dto.py             |       29 |        0 |        0 |        0 |    100% |           |
+| src/entities/models/model\_enums.py    |       15 |        0 |        0 |        0 |    100% |           |
+| src/entities/repos/submission\_repo.py |       41 |        2 |       12 |        1 |     94% |    32, 66 |
+| src/main.py                            |        4 |        4 |        0 |        0 |      0% |       1-8 |
+| src/routers/\_\_init\_\_.py            |        2 |        2 |        0 |        0 |      0% |       1-3 |
+| src/routers/filing.py                  |       10 |       10 |        2 |        0 |      0% |      1-15 |
+| src/services/submission\_processor.py  |        4 |        4 |        0 |        0 |      0% |       1-8 |
+|                              **TOTAL** |  **173** |   **23** |   **22** |    **2** | **86%** |           |
 
-2 empty files skipped.
+3 empty files skipped.
 
 
 ## Setup coverage badge
