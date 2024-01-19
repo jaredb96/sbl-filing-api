@@ -1,6 +1,9 @@
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List, TypeVar
+from entities.engine import get_session
 
 from entities.models import (
     SubmissionDAO,
@@ -11,6 +14,8 @@ from entities.models import (
     FilingDTO,
     FilingDAO,
 )
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -47,6 +52,19 @@ async def add_submission(session: AsyncSession, submission: SubmissionDTO) -> Su
         new_sub = await session.merge(new_sub)
         await session.commit()
         return new_sub
+
+
+async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSession = None) -> SubmissionDAO:
+    session = incoming_session if incoming_session else await anext(get_session())
+    async with session.begin():
+        try:
+            new_sub = await session.merge(submission)
+            await session.commit()
+            return new_sub
+        except Exception as e:
+            await session.rollback()
+            logger.error(f"There was an exception storing the updated SubmissionDAO, rolling back transaction: {e}")
+            raise
 
 
 async def upsert_filing_period(session: AsyncSession, filing_period: FilingPeriodDTO) -> FilingPeriodDAO:
