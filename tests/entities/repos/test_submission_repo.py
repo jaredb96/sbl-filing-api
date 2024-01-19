@@ -30,15 +30,23 @@ class TestSubmissionRepo:
             start_period=datetime.now(),
             end_period=datetime.now(),
             due=datetime.now(),
-            filing_type=FilingType.TYPE_A,
+            filing_type=FilingType.MANUAL,
         )
         transaction_session.add(filing_period)
 
         filing1 = FilingDAO(
-            lei="1234567890", state=FilingState.FILING_STARTED, institution_snapshot_id="Snapshot-1", filing_period=1
+            lei="1234567890",
+            state=FilingState.FILING_STARTED,
+            institution_snapshot_id="Snapshot-1",
+            filing_period=1,
+            contact_info="contact@test.com",
         )
         filing2 = FilingDAO(
-            lei="ABCDEFGHIJ", state=FilingState.FILING_STARTED, institution_snapshot_id="Snapshot-1", filing_period=1
+            lei="ABCDEFGHIJ",
+            state=FilingState.FILING_STARTED,
+            institution_snapshot_id="Snapshot-1",
+            filing_period=1,
+            contact_info="contact@test.com",
         )
         transaction_session.add(filing1)
         transaction_session.add(filing2)
@@ -73,17 +81,17 @@ class TestSubmissionRepo:
             start_period=datetime.now(),
             end_period=datetime.now(),
             due=datetime.now(),
-            filing_type=FilingType.TYPE_B,
+            filing_type=FilingType.MANUAL,
         )
         res = await repo.upsert_filing_period(transaction_session, new_fp)
         assert res.id == 2
-        assert res.filing_type == FilingType.TYPE_B
+        assert res.filing_type == FilingType.MANUAL
 
     async def test_get_filing_period(self, query_session: AsyncSession):
         res = await repo.get_filing_period(query_session, filing_period_id=1)
         assert res.id == 1
         assert res.name == "FilingPeriod2024"
-        assert res.filing_type == FilingType.TYPE_A
+        assert res.filing_type == FilingType.MANUAL
 
     async def test_add_and_modify_filing(self, transaction_session: AsyncSession):
         new_filing = FilingDTO(
@@ -91,6 +99,7 @@ class TestSubmissionRepo:
             state=FilingState.FILING_IN_PROGRESS,
             institution_snapshot_id="Snapshot-1",
             filing_period=1,
+            contact_info="contact@test.com",
         )
         res = await repo.upsert_filing(transaction_session, new_filing)
         assert res.id == 3
@@ -103,6 +112,7 @@ class TestSubmissionRepo:
             state=FilingState.FILING_COMPLETE,
             institution_snapshot_id="Snapshot-1",
             filing_period=1,
+            contact_info="contact@test.com",
         )
         res = await repo.upsert_filing(transaction_session, mod_filing)
         assert res.id == 3
@@ -113,7 +123,7 @@ class TestSubmissionRepo:
         res = await repo.get_filing_period(query_session, filing_period_id=1)
         assert res.id == 1
         assert res.name == "FilingPeriod2024"
-        assert res.filing_type == FilingType.TYPE_A
+        assert res.filing_type == FilingType.MANUAL
 
     async def test_get_submission(self, query_session: AsyncSession):
         res = await repo.get_submission(query_session, submission_id=1)
