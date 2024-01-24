@@ -10,11 +10,11 @@
 | src/entities/models/dto.py             |       29 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/model\_enums.py    |       15 |        0 |        0 |        0 |    100% |           |
 | src/entities/repos/submission\_repo.py |       41 |        2 |       12 |        1 |     94% |    32, 66 |
-| src/main.py                            |        4 |        4 |        0 |        0 |      0% |       1-8 |
+| src/main.py                            |       14 |       14 |        2 |        0 |      0% |      1-22 |
 | src/routers/\_\_init\_\_.py            |        2 |        2 |        0 |        0 |      0% |       1-3 |
 | src/routers/filing.py                  |       10 |       10 |        2 |        0 |      0% |      1-15 |
 | src/services/submission\_processor.py  |        4 |        4 |        0 |        0 |      0% |       1-8 |
-|                              **TOTAL** |  **173** |   **23** |   **22** |    **2** | **86%** |           |
+|                              **TOTAL** |  **183** |   **33** |   **24** |    **2** | **81%** |           |
 
 3 empty files skipped.
 
