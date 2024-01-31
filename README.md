@@ -5,16 +5,18 @@
 | Name                                   |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
 |--------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
 | src/config.py                          |       26 |        0 |        8 |        1 |     97% |    10->14 |
+| src/entities/engine/\_\_init\_\_.py    |        2 |        0 |        0 |        0 |    100% |           |
+| src/entities/engine/engine.py          |       10 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/\_\_init\_\_.py    |        4 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/dao.py             |       38 |        1 |        0 |        0 |     97% |        27 |
 | src/entities/models/dto.py             |       29 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/model\_enums.py    |       15 |        0 |        0 |        0 |    100% |           |
-| src/entities/repos/submission\_repo.py |       41 |        2 |       12 |        1 |     94% |    32, 66 |
+| src/entities/repos/submission\_repo.py |       55 |        6 |       14 |        1 |     90% |37, 64-67, 84 |
 | src/main.py                            |       14 |       14 |        2 |        0 |      0% |      1-22 |
 | src/routers/\_\_init\_\_.py            |        2 |        2 |        0 |        0 |      0% |       1-3 |
 | src/routers/filing.py                  |       10 |       10 |        2 |        0 |      0% |      1-15 |
 | src/services/submission\_processor.py  |        4 |        4 |        0 |        0 |      0% |       1-8 |
-|                              **TOTAL** |  **183** |   **33** |   **24** |    **2** | **81%** |           |
+|                              **TOTAL** |  **209** |   **37** |   **26** |    **2** | **82%** |           |
 
 3 empty files skipped.
 
