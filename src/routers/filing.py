@@ -5,7 +5,7 @@ from services import submission_processor
 from typing import Annotated, List
 
 from entities.engine import get_session
-from entities.models import FilingPeriodDTO
+from entities.models import FilingPeriodDTO, SubmissionDTO
 from entities.repos import submission_repo as repo
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,3 +30,8 @@ async def upload_file(
     content = await file.read()
     await submission_processor.upload_to_storage(lei, submission_id, content)
     background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content)
+
+
+@router.get("/{lei}/filings/{filing_id}/submissions", response_model=List[SubmissionDTO])
+async def get_submission(request: Request, lei: str, filing_id: int):
+    return await repo.get_submissions(request.state.db_session, filing_id)
