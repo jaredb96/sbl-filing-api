@@ -18,4 +18,4 @@ class FilingState(str, Enum):
 
 
 class FilingType(str, Enum):
-    MANUAL = "MANUAL"
+    ANNUAL = "ANNUAL"
