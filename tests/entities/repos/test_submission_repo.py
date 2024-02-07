@@ -34,7 +34,7 @@ class TestSubmissionRepo:
             start_period=datetime.now(),
             end_period=datetime.now(),
             due=datetime.now(),
-            filing_type=FilingType.MANUAL,
+            filing_type=FilingType.ANNUAL,
         )
         transaction_session.add(filing_period)
 
@@ -83,11 +83,11 @@ class TestSubmissionRepo:
             start_period=datetime.now(),
             end_period=datetime.now(),
             due=datetime.now(),
-            filing_type=FilingType.MANUAL,
+            filing_type=FilingType.ANNUAL,
         )
         res = await repo.upsert_filing_period(transaction_session, new_fp)
         assert res.id == 2
-        assert res.filing_type == FilingType.MANUAL
+        assert res.filing_type == FilingType.ANNUAL
 
     async def test_get_filing_periods(self, query_session: AsyncSession):
         res = await repo.get_filing_periods(query_session)
@@ -98,7 +98,7 @@ class TestSubmissionRepo:
         res = await repo.get_filing_period(query_session, filing_period_id=1)
         assert res.id == 1
         assert res.name == "FilingPeriod2024"
-        assert res.filing_type == FilingType.MANUAL
+        assert res.filing_type == FilingType.ANNUAL
 
     async def test_add_and_modify_filing(self, transaction_session: AsyncSession):
         new_filing = FilingDTO(
