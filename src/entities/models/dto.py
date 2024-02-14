@@ -31,7 +31,7 @@ class FilingTaskStateDTO(BaseModel):
     task: FilingTaskDTO
     user: str | None = None
     state: FilingTaskState
-    change_timestamp: datetime
+    change_timestamp: datetime | None = None
 
 
 class FilingDTO(BaseModel):
