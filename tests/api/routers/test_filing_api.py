@@ -103,7 +103,7 @@ class TestFilingApi:
         mock.assert_called_with(ANY, 1)
         assert res.status_code == 204
 
-    def test_upload_file_pass(self, mocker: MockerFixture, app_fixture: FastAPI, submission_csv: str):
+    def test_upload_file(self, mocker: MockerFixture, app_fixture: FastAPI, submission_csv: str):
 
         mock_upload = mocker.patch("services.submission_processor.upload_to_storage")
         mock_upload.return_value = None
