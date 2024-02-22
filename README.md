@@ -8,15 +8,15 @@
 | src/entities/engine/\_\_init\_\_.py    |        2 |        0 |        0 |        0 |    100% |           |
 | src/entities/engine/engine.py          |       10 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/\_\_init\_\_.py    |        4 |        0 |        0 |        0 |    100% |           |
-| src/entities/models/dao.py             |       54 |        2 |        0 |        0 |     96% |    46, 59 |
-| src/entities/models/dto.py             |       41 |        0 |        0 |        0 |    100% |           |
+| src/entities/models/dao.py             |       55 |        3 |        0 |        0 |     95% |27, 46, 61 |
+| src/entities/models/dto.py             |       40 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/model\_enums.py    |       14 |        0 |        0 |        0 |    100% |           |
-| src/entities/repos/submission\_repo.py |       87 |        4 |       28 |        1 |     96% |61->63, 111-114 |
+| src/entities/repos/submission\_repo.py |       93 |        4 |       26 |        2 |     95% |59->61, 66->68, 101-104 |
 | src/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/routers/\_\_init\_\_.py            |        2 |        0 |        0 |        0 |    100% |           |
-| src/routers/filing.py                  |       39 |        3 |       20 |        0 |     95% |     43-45 |
+| src/routers/filing.py                  |       41 |        4 |       24 |        1 |     92% | 38, 47-49 |
 | src/services/submission\_processor.py  |        4 |        2 |        0 |        0 |     50% |      3, 8 |
-|                              **TOTAL** |  **318** |   **22** |   **58** |    **2** | **94%** |           |
+|                              **TOTAL** |  **326** |   **24** |   **60** |    **4** | **93%** |           |
 
 3 empty files skipped.
 
