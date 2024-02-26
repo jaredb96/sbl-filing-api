@@ -21,6 +21,18 @@ class Settings(BaseSettings):
     db_host: str
     db_scheme: str = "postgresql+asyncpg"
     conn: PostgresDsn | None = None
+    '''
+    upload_fs_protocol: to be used with fsspec, and s3fs
+    `file` is for local file system
+    `s3` is for AWS S3
+    '''
+    upload_fs_protocol: str
+    '''
+    upload_fs_root: root of the upload folder in file system
+    with `file` protocol, this can be any directory you specific (e.g. `../upload`)
+    if using `s3` for the protocol, this should be the bucket name (e.g. `my-s3-bucket`)
+    '''
+    upload_fs_root: str
 
     def __init__(self, **data):
         super().__init__(**data)
