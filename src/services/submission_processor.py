@@ -15,7 +15,6 @@ async def upload_to_storage(lei: str, submission_id: str, content: bytes):
 
 
 async def validate_submission(lei: str, submission_id: str, content: bytes, background_tasks: BackgroundTasks):
-
     df = pd.read_csv(BytesIO(content), dtype=str, na_filter=False)
     validator_version = imeta.version("regtech-data-validator")
 

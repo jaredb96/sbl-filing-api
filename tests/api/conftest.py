@@ -118,9 +118,9 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
     return mock
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def submission_csv(tmpdir_factory) -> str:
     df = pd.DataFrame([["0", "1"]], columns=["Submission_Column_1", "Submission_Column_2"])
-    filename = str(tmpdir_factory.mktemp('data').join('submission.csv'))
+    filename = str(tmpdir_factory.mktemp("data").join("submission.csv"))
     df.to_csv(filename)
     return filename
