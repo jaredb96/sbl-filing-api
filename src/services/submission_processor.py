@@ -6,6 +6,7 @@ from config import settings
 
 log = logging.getLogger(__name__)
 
+
 async def upload_to_storage(lei: str, submission_id: str, content: bytes, extension: str = "csv"):
     try:
         fs: AbstractFileSystem = filesystem(settings.upload_fs_protocol)
