@@ -18,6 +18,7 @@ class FsProtocol(Enum):
     FILE = "file"
     S3 = "s3"
 
+
 class Settings(BaseSettings):
     db_schema: str = "public"
     db_name: str
