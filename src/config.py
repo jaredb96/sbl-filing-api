@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import StrEnum
 import os
 from urllib import parse
 from typing import Any
@@ -14,7 +14,7 @@ if os.getenv("ENV", "LOCAL") == "LOCAL":
     env_files_to_load.append(".env.local")
 
 
-class FsProtocol(Enum):
+class FsProtocol(StrEnum):
     FILE = "file"
     S3 = "s3"
 
