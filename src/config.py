@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 from urllib import parse
 from typing import Any
@@ -13,6 +14,10 @@ if os.getenv("ENV", "LOCAL") == "LOCAL":
     env_files_to_load.append(".env.local")
 
 
+class FsProtocol(Enum):
+    FILE = "file"
+    S3 = "s3"
+
 class Settings(BaseSettings):
     db_schema: str = "public"
     db_name: str
@@ -26,7 +31,7 @@ class Settings(BaseSettings):
     `file` is for local file system
     `s3` is for AWS S3
     """
-    upload_fs_protocol: str
+    upload_fs_protocol: FsProtocol = FsProtocol.FILE
     """
     upload_fs_root: root of the upload folder in file system
     with `file` protocol, this can be any directory you specific (e.g. `../upload`)
