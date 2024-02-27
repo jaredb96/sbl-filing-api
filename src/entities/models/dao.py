@@ -66,7 +66,16 @@ class FilingDAO(Base):
     tasks: Mapped[List[FilingTaskStateDAO]] = relationship(lazy="selectin", cascade="all, delete-orphan")
     filing_period: Mapped[int] = mapped_column(ForeignKey("filing_period.id"))
     institution_snapshot_id: Mapped[str]
-    contact_info: Mapped[str] = mapped_column(nullable=True)
+    contact_info: Mapped[int] = mapped_column(ForeignKey("contact_info.id"), primary_key=True)
+
+
+class ContactInfoDAO(Base):
+    __tablename__ = "contact_info"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    first_name: Mapped[str]
+    last_name: Mapped[str]
+    email: Mapped[str]
+    phone: Mapped[str]
 
 
 # Commenting out for now since we're just storing the results from the data-validator as JSON.

@@ -34,6 +34,16 @@ class FilingTaskStateDTO(BaseModel):
     change_timestamp: datetime | None = None
 
 
+class ContactInfoDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
+
+
 class FilingDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -42,7 +52,7 @@ class FilingDTO(BaseModel):
     tasks: List[FilingTaskStateDTO]
     filing_period: int
     institution_snapshot_id: str
-    contact_info: str | None = None
+    contact_info: ContactInfoDTO
 
 
 class FilingPeriodDTO(BaseModel):
