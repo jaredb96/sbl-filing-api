@@ -2,7 +2,7 @@ from http import HTTPStatus
 from fastapi import HTTPException
 import logging
 from fsspec import AbstractFileSystem, filesystem
-from config import settings
+from config import settings, FsProtocol
 
 log = logging.getLogger(__name__)
 
@@ -10,7 +10,8 @@ log = logging.getLogger(__name__)
 async def upload_to_storage(lei: str, submission_id: str, content: bytes, extension: str = "csv"):
     try:
         fs: AbstractFileSystem = filesystem(settings.upload_fs_protocol.value)
-        fs.mkdirs(f"{settings.upload_fs_root}/{lei}", exist_ok=True)
+        if settings.upload_fs_protocol == FsProtocol.FILE:
+            fs.mkdirs(f"{settings.upload_fs_root}/{lei}", exist_ok=True)
         with fs.open(f"{settings.upload_fs_root}/{lei}/{submission_id}.{extension}", "wb") as f:
             f.write(content)
     except Exception as e:
