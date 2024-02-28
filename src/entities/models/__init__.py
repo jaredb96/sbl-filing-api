@@ -28,5 +28,6 @@ from .dto import (
     FilingTaskDTO,
     UpdateValueDTO,
     StateUpdateDTO,
-), ContactInfoDTO
+    ContactInfoDTO,
+)
 from .model_enums import FilingType, FilingTaskState, SubmissionState
