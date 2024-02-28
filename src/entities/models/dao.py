@@ -79,6 +79,9 @@ class FilingDAO(Base):
     tasks: Mapped[List[FilingTaskStateDAO]] = relationship(lazy="selectin", cascade="all, delete-orphan")
     institution_snapshot_id: Mapped[str]
 
+    def __str__(self):
+        return f"ID: {self.id}, Filing Period: {self.filing_period}, LEI: {self.lei}, Tasks: {self.tasks}, Institution Snapshot ID: {self.institution_snapshot_id}, Contact Info: {self.contact_info}"
+
 
 # Commenting out for now since we're just storing the results from the data-validator as JSON.
 # If we determine building the data structure for results as tables is needed, we can add these

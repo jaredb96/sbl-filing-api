@@ -1,12 +1,14 @@
 import datetime
 
+from copy import deepcopy
+
 from unittest.mock import ANY, Mock
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
-from entities.models import SubmissionDAO, SubmissionState, ContactInfoDAO
+from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO
 
 
 class TestFilingApi:
@@ -102,6 +104,63 @@ class TestFilingApi:
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/latest")
         mock.assert_called_with(ANY, "1234567890", "2024")
         assert res.status_code == 204
+
+    async def test_patch_filing(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, get_filing_mock: Mock
+    ):
+        filing_return = get_filing_mock.return_value
+
+        mock = mocker.patch("entities.repos.submission_repo.upsert_filing")
+        updated_filing_obj = deepcopy(get_filing_mock.return_value)
+        updated_filing_obj.institution_snapshot_id = "v3"
+        mock.return_value = updated_filing_obj
+
+        client = TestClient(app_fixture)
+
+        # no existing filing for endpoint
+        get_filing_mock.return_value = None
+        res = client.patch(
+            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": "v3"}
+        )
+        assert res.status_code == 204
+
+        # no known field for endpoint
+        get_filing_mock.return_value = filing_return
+        res = client.patch("/v1/filing/institutions/1234567890/filings/2024/fields/unknown_field", json={"value": "v3"})
+        assert res.status_code == 204
+
+        # unallowed value data type
+        res = client.patch(
+            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": ["1", "2"]}
+        )
+        assert res.status_code == 422
+
+        # good
+        res = client.patch(
+            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": "v3"}
+        )
+        assert res.status_code == 200
+        assert res.json()["institution_snapshot_id"] == "v3"
+
+    async def test_unauthed_task_update(self, app_fixture: FastAPI, unauthed_user_mock: Mock):
+        client = TestClient(app_fixture)
+        res = client.post(
+            "/v1/filing/institutions/1234567890/filings/2024/tasks/Task-1",
+            json={"state": "COMPLETED"},
+        )
+        assert res.status_code == 403
+
+    async def test_task_update(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+        mock = mocker.patch("entities.repos.submission_repo.update_task_state")
+        client = TestClient(app_fixture)
+        res = client.post(
+            "/v1/filing/institutions/1234567890/filings/2024/tasks/Task-1",
+            json={"state": "COMPLETED"},
+        )
+        assert res.status_code == 200
+        mock.assert_called_with(
+            ANY, "1234567890", "2024", "Task-1", FilingTaskState.COMPLETED, authed_user_mock.return_value[1]
+        )
 
     async def test_get_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("entities.repos.submission_repo.get_contact_info")

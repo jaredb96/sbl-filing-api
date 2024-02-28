@@ -6,7 +6,7 @@ from services import submission_processor
 from typing import Annotated, List
 
 from entities.engine import get_session
-from entities.models import FilingPeriodDTO, SubmissionDTO, FilingDTO, ContactInfoDTO
+from entities.models import FilingPeriodDTO, SubmissionDTO, FilingDTO, UpdateValueDTO, StateUpdateDTO, ContactInfoDTO
 from entities.repos import submission_repo as repo
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,7 +45,7 @@ async def upload_file(
     request: Request, lei: str, submission_id: str, file: UploadFile, background_tasks: BackgroundTasks
 ):
     content = await file.read()
-    await submission_processor.upload_to_storage(lei, submission_id, content)
+    await submission_processor.upload_to_storage(lei, submission_id, content, file.filename.split(".")[-1])
     background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content)
 
 
@@ -61,6 +61,23 @@ async def get_submission_latest(request: Request, lei: str, period_name: str):
     if result:
         return result
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+
+
+@router.patch("/institutions/{lei}/filings/{period_name}/fields/{field_name}", response_model=FilingDTO)
+@requires("authenticated")
+async def patch_filing(request: Request, lei: str, period_name: str, field_name: str, update_value: UpdateValueDTO):
+    result = await repo.get_filing(request.state.db_session, lei, period_name)
+    if result:
+        if getattr(result, field_name, None):
+            setattr(result, field_name, update_value.value)
+            return await repo.upsert_filing(request.state.db_session, result)
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+
+
+@router.post("/institutions/{lei}/filings/{period_name}/tasks/{task_name}")
+@requires("authenticated")
+async def update_task_state(request: Request, lei: str, period_name: str, task_name: str, state: StateUpdateDTO):
+    await repo.update_task_state(request.state.db_session, lei, period_name, task_name, state.state, request.user)
 
 
 @router.get("/institutions/{lei}/filings/{period_name}/contact_info", response_model=List[ContactInfoDTO])

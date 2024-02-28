@@ -13,10 +13,20 @@ __all__ = [
     "FilingPeriodDTO",
     "FilingType",
     "FilingTaskState",
+    "UpdateValueDTO",
+    "StateUpdateDTO",
     "ContactInfoDAO",
     "ContactInfoDTO",
 ]
 
 from .dao import Base, SubmissionDAO, FilingPeriodDAO, FilingDAO, FilingTaskStateDAO, FilingTaskDAO, ContactInfoDAO
-from .dto import SubmissionDTO, FilingDTO, FilingPeriodDTO, FilingTaskStateDTO, FilingTaskDTO, ContactInfoDTO
+from .dto import (
+    SubmissionDTO,
+    FilingDTO,
+    FilingPeriodDTO,
+    FilingTaskStateDTO,
+    FilingTaskDTO,
+    UpdateValueDTO,
+    StateUpdateDTO,
+), ContactInfoDTO
 from .model_enums import FilingType, FilingTaskState, SubmissionState
