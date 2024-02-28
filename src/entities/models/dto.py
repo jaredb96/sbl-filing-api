@@ -51,7 +51,6 @@ class FilingDTO(BaseModel):
     lei: str
     tasks: List[FilingTaskStateDTO]
     institution_snapshot_id: str
-    contact_info: ContactInfoDTO
 
 
 class FilingPeriodDTO(BaseModel):

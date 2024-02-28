@@ -20,6 +20,8 @@ from entities.models import (
     FilingTaskDAO,
     FilingTaskStateDAO,
     FilingTaskState,
+    ContactInfoDAO,
+    ContactInfoDTO,
 )
 
 logger = logging.getLogger(__name__)
@@ -78,6 +80,15 @@ async def get_filing_tasks(session: AsyncSession) -> List[FilingTaskDAO]:
     return await query_helper(session, FilingTaskDAO)
 
 
+async def get_contact_info(session: AsyncSession, lei: str = None, filing_period: str = None) -> ContactInfoDAO:
+    filing_id = None
+    if lei and filing_period:
+        filing = await get_filing(session, lei=lei, filing_period=filing_period)
+        filing_id = filing.id
+    result = await query_helper(session, ContactInfoDAO, filing=filing_id)
+    return result[0] if result else None
+
+
 async def add_submission(session: AsyncSession, submission: SubmissionDTO) -> SubmissionDAO:
     async with session.begin():
         new_sub = SubmissionDAO(
@@ -121,6 +132,22 @@ async def create_new_filing(session: AsyncSession, lei: str, filing_period: str)
     new_filing = await upsert_helper(session, new_filing, FilingDAO)
     new_filing = await populate_missing_tasks(session, [new_filing])
     return new_filing[0]
+
+
+async def update_contact_info(session: AsyncSession, contact_info: ContactInfoDTO) -> ContactInfoDAO:
+    return await upsert_helper(session, contact_info, ContactInfoDAO)
+
+
+async def add_contact_info(session: AsyncSession, contact_info: ContactInfoDTO) -> ContactInfoDAO:
+    new_contact_info = ContactInfoDAO(
+        filing=contact_info.filing,
+        first_name=contact_info.first_name,
+        last_name=contact_info.last_name,
+        phone=contact_info.phone,
+        email=contact_info.email,
+    )
+    new_contact_info = await upsert_helper(session, new_contact_info, ContactInfoDAO)
+    return new_contact_info
 
 
 async def upsert_helper(session: AsyncSession, original_data: Any, table_obj: T) -> T:

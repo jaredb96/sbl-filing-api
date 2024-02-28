@@ -6,7 +6,7 @@ from services import submission_processor
 from typing import Annotated, List
 
 from entities.engine import get_session
-from entities.models import FilingPeriodDTO, SubmissionDTO, FilingDTO
+from entities.models import FilingPeriodDTO, SubmissionDTO, FilingDTO, ContactInfoDTO
 from entities.repos import submission_repo as repo
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -61,3 +61,17 @@ async def get_submission_latest(request: Request, lei: str, period_name: str):
     if result:
         return result
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+
+
+@router.get("/institutions/{lei}/filings/{period_name}/contact_info", response_model=List[ContactInfoDTO])
+@requires("authenticated")
+async def get_contact_info(request: Request, lei: str, period_name: str):
+    return await repo.get_contact_info(request.state.db_session, lei, period_name)
+
+
+@router.post("/institutions/{lei}/filings/{period_name}/contact_info", response_model=ContactInfoDTO)
+async def post_contact_info(request: Request, lei: str, period_name: str, contact_info_obj: ContactInfoDTO = None):
+    if contact_info_obj:
+        return await repo.update_contact_info(request.state.db_session, contact_info_obj)
+    else:
+        return await repo.add_contact_info(request.state.db_session, contact_info_obj)

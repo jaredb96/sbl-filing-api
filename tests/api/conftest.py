@@ -5,7 +5,14 @@ from fastapi import FastAPI
 from pytest_mock import MockerFixture
 from unittest.mock import Mock
 
-from entities.models import FilingPeriodDAO, FilingType, FilingDAO, FilingTaskStateDAO, FilingTaskState, FilingTaskDAO
+from entities.models import (
+    FilingPeriodDAO,
+    FilingType,
+    FilingDAO,
+    FilingTaskStateDAO,
+    FilingTaskState,
+    FilingTaskDAO,
+)
 
 from regtech_api_commons.models.auth import AuthenticatedUser
 from starlette.authentication import AuthCredentials, UnauthenticatedUser
@@ -84,7 +91,6 @@ def get_filing_mock(mocker: MockerFixture) -> Mock:
         ],
         filing_period="2024",
         institution_snapshot_id="v1",
-        contact_info="test@cfpb.gov",
     )
     return mock
 

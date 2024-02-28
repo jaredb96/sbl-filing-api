@@ -17,6 +17,8 @@ from entities.models import (
     FilingType,
     FilingTaskState,
     SubmissionState,
+    ContactInfoDAO,
+    ContactInfoDTO,
 )
 from entities.repos import submission_repo as repo
 from pytest_mock import MockerFixture
@@ -95,6 +97,34 @@ class TestSubmissionRepo:
         transaction_session.add(submission1)
         transaction_session.add(submission2)
         transaction_session.add(submission3)
+
+        contact_info1 = ContactInfoDAO(
+            id=1,
+            filing=1,
+            first_name="test_first_name_1",
+            last_name="test_last_name_1",
+            phone="112-345-6789",
+            email="test1@cfpb.gov",
+        )
+        contact_info2 = ContactInfoDAO(
+            id=2,
+            filing=2,
+            first_name="test_first_name_2",
+            last_name="test_last_name_2",
+            phone="212-345-6789",
+            email="test2@cfpb.gov",
+        )
+        contact_info3 = ContactInfoDAO(
+            id=3,
+            filing=2,
+            first_name="test_first_name_3",
+            last_name="test_last_name_3",
+            phone="312-345-6789",
+            email="test3@cfpb.gov",
+        )
+        transaction_session.add(contact_info1)
+        transaction_session.add(contact_info2)
+        transaction_session.add(contact_info3)
 
         await transaction_session.commit()
 
@@ -280,6 +310,50 @@ class TestSubmissionRepo:
                 assert new_res2.validation_json == validation_json
 
         await query_updated_dao()
+
+    async def test_get_contact_info(self, query_session: AsyncSession):
+        res = await repo.get_contact_info(query_session, lei="1234567890", filing_period="2024")
+        assert res.id == 1
+        assert res.filing == 1
+        assert res.first_name == "test_first_name_1"
+        assert res.last_name == "test_last_name_1"
+        assert res.phone == "112-345-6789"
+        assert res.email == "test1@cfpb.gov"
+
+    async def test_add_contact_info(self, transaction_session: AsyncSession):
+        res = await repo.add_contact_info(
+            transaction_session,
+            ContactInfoDAO(
+                first_name="test_first_name_4",
+                last_name="test_last_name_4",
+                phone="412-345-6789",
+                email="test4@cfpb.gov",
+                filing=1,
+            ),
+        )
+        assert res.id == 4
+        assert res.filing == 1
+        assert res.first_name == "test_first_name_4"
+        assert res.last_name == "test_last_name_4"
+        assert res.phone == "412-345-6789"
+        assert res.email == "test4@cfpb.gov"
+
+    async def test_update_contact_info(self, transaction_session: AsyncSession):
+        upd_contact_info = ContactInfoDTO(
+            id=2,
+            filing=2,
+            first_name="test_first_name_upd",
+            last_name="test_last_name_upd",
+            phone="212-345-6789_upd",
+            email="test2_upd@cfpb.gov",
+        )
+        res = await repo.update_contact_info(transaction_session, upd_contact_info)
+        assert res.id == 2
+        assert res.filing == 2
+        assert res.first_name == "test_first_name_upd"
+        assert res.last_name == "test_last_name_upd"
+        assert res.phone == "212-345-6789_upd"
+        assert res.email == "test2_upd@cfpb.gov"
 
     def get_error_json(self):
         df_columns = [
