@@ -123,7 +123,6 @@ class TestFilingApi:
         assert res.status_code == 204
 
     async def test_unauthed_patch_filing(self, mocker: MockerFixture, app_fixture: FastAPI):
-
         client = TestClient(app_fixture)
 
         res = client.patch(
