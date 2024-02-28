@@ -19,7 +19,13 @@ async def validate_submission(lei: str, submission_id: str, content: bytes, back
     validator_version = imeta.version("regtech-data-validator")
 
     # Set VALIDATION_IN_PROGRESS
-    await update_submission(SubmissionDAO(submitter=submission_id, state=SubmissionState.VALIDATION_IN_PROGRESS))
+    await update_submission(
+        SubmissionDAO(
+            submitter=submission_id,
+            state=SubmissionState.VALIDATION_IN_PROGRESS,
+            validation_ruleset_version=validator_version,
+        )
+    )
     background_tasks.add_task(validate_and_update_submission, df, lei, submission_id, validator_version)
 
 
