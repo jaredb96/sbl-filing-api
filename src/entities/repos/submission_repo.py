@@ -166,12 +166,13 @@ async def populate_missing_tasks(session: AsyncSession, filings: List[FilingDAO]
     filings_copy = deepcopy(filings)
     for f in filings_copy:
         tasks = [t.task.name for t in f.tasks]
-        missing_tasks = [t.name for t in filing_tasks if t.name not in tasks]
+        missing_tasks = [t for t in filing_tasks if t.name not in tasks]
         for mt in missing_tasks:
             f.tasks.append(
                 FilingTaskStateDAO(
                     filing=f.id,
-                    task_name=mt,
+                    task_name=mt.name,
+                    task=mt,
                     state=FilingTaskState.NOT_STARTED,
                     user="",
                 )
