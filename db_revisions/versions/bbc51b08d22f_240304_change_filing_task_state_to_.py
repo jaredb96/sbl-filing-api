@@ -19,7 +19,21 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.rename_table("filing_task_state", "filing_task_progress")
+    with op.batch_alter_table("filing_task_progress") as batch_op:
+        batch_op.drop_constraint("filing_task_state_pkey")
+        batch_op.drop_constraint("filing_task_state_filing_fkey")
+        batch_op.drop_constraint("filing_task_state_filing_task_fkey")
+        batch_op.create_primary_key("filing_task_progress_pkey", ["id"])
+        batch_op.create_foreign_key("filing_task_progress_filing_fkey", "filing", ["filing"], ["id"])
+        batch_op.create_foreign_key("filing_task_progress_filing_task_fkey", "filing_task", ["task_name"], ["name"])
 
 
 def downgrade() -> None:
     op.rename_table("filing_task_progress", "filing_task_state")
+    with op.batch_alter_table("filing_task_state") as batch_op:
+        batch_op.drop_constraint("filing_task_progress_pkey")
+        batch_op.drop_constraint("filing_task_progress_filing_fkey")
+        batch_op.drop_constraint("filing_task_progress_filing_task_fkey")
+        batch_op.create_primary_key("filing_task_state_pkey", ["id"])
+        batch_op.create_foreign_key("filing_task_state_filing_fkey", "filing", ["filing"], ["id"])
+        batch_op.create_foreign_key("filing_task_state_filing_task_fkey", "filing_task", ["task_name"], ["name"])
