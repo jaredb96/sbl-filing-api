@@ -28,11 +28,13 @@ async def get_filing_periods(request: Request):
 
 
 @router.get("/institutions/{lei}/filings/{period_name}", response_model=FilingDTO)
+@requires("authenticated")
 async def get_filing(request: Request, lei: str, period_name: str):
     return await repo.get_filing(request.state.db_session, lei, period_name)
 
 
 @router.post("/institutions/{lei}/filings/{period_name}", response_model=FilingDTO)
+@requires("authenticated")
 async def post_filing(request: Request, lei: str, period_name: str, filing_obj: FilingDTO = None):
     if filing_obj:
         return await repo.upsert_filing(request.state.db_session, filing_obj)
@@ -41,6 +43,7 @@ async def post_filing(request: Request, lei: str, period_name: str, filing_obj: 
 
 
 @router.post("/{lei}/submissions/{submission_id}", status_code=HTTPStatus.ACCEPTED)
+@requires("authenticated")
 async def upload_file(
     request: Request, lei: str, submission_id: str, file: UploadFile, background_tasks: BackgroundTasks
 ):
@@ -56,6 +59,7 @@ async def get_submission(request: Request, lei: str, period_name: str):
 
 
 @router.get("/institutions/{lei}/filings/{period_name}/submissions/latest", response_model=SubmissionDTO)
+@requires("authenticated")
 async def get_submission_latest(request: Request, lei: str, period_name: str):
     result = await repo.get_latest_submission(request.state.db_session, lei, period_name)
     if result:
