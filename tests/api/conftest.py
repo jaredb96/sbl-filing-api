@@ -5,7 +5,14 @@ from fastapi import FastAPI
 from pytest_mock import MockerFixture
 from unittest.mock import Mock
 
-from entities.models import FilingPeriodDAO, FilingType, FilingDAO, FilingTaskStateDAO, FilingTaskState, FilingTaskDAO
+from entities.models import (
+    FilingPeriodDAO,
+    FilingType,
+    FilingDAO,
+    FilingTaskProgressDAO,
+    FilingTaskState,
+    FilingTaskDAO,
+)
 
 from regtech_api_commons.models.auth import AuthenticatedUser
 from starlette.authentication import AuthCredentials, UnauthenticatedUser
@@ -67,14 +74,14 @@ def get_filing_mock(mocker: MockerFixture) -> Mock:
         id=1,
         lei="1234567890",
         tasks=[
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=1,
                 filing=1,
                 task=FilingTaskDAO(name="Task-1", task_order=1),
                 state=FilingTaskState.NOT_STARTED,
                 user="",
             ),
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=2,
                 filing=1,
                 task=FilingTaskDAO(name="Task-2", task_order=2),
@@ -96,14 +103,14 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         id=3,
         lei="ZXWVUTSRQP",
         tasks=[
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=1,
                 filing=3,
                 task=FilingTaskDAO(name="Task-1", task_order=1),
                 state=FilingTaskState.NOT_STARTED,
                 user="",
             ),
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=2,
                 filing=3,
                 task=FilingTaskDAO(name="Task-2", task_order=2),

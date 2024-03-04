@@ -5,8 +5,8 @@ __all__ = [
     "SubmissionState",
     "FilingDAO",
     "FilingDTO",
-    "FilingTaskStateDAO",
-    "FilingTaskStateDTO",
+    "FilingTaskProgressDAO",
+    "FilingTaskProgressDTO",
     "FilingTaskDAO",
     "FilingTaskDTO",
     "FilingPeriodDAO",
@@ -17,12 +17,12 @@ __all__ = [
     "StateUpdateDTO",
 ]
 
-from .dao import Base, SubmissionDAO, FilingPeriodDAO, FilingDAO, FilingTaskStateDAO, FilingTaskDAO
+from .dao import Base, SubmissionDAO, FilingPeriodDAO, FilingDAO, FilingTaskProgressDAO, FilingTaskDAO
 from .dto import (
     SubmissionDTO,
     FilingDTO,
     FilingPeriodDTO,
-    FilingTaskStateDTO,
+    FilingTaskProgressDTO,
     FilingTaskDTO,
     UpdateValueDTO,
     StateUpdateDTO,

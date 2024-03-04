@@ -109,3 +109,27 @@ def test_migration_to_19fccbf914bc(alembic_runner: MigrationContext, alembic_eng
     inspector = sqlalchemy.inspect(alembic_engine)
 
     assert "submission_time" in set([c["name"] for c in inspector.get_columns("submission")])
+
+
+def test_migration_to_bbc51b08d22f(alembic_runner: MigrationContext, alembic_engine: Engine):
+    alembic_runner.migrate_up_to("bbc51b08d22f")
+
+    inspector = sqlalchemy.inspect(alembic_engine)
+    tables = inspector.get_table_names()
+    assert "filing_task_progress" in tables
+    assert "filing_task_state" not in tables
+    assert {"id", "filing", "task_name", "state", "user", "change_timestamp"} == set(
+        [c["name"] for c in inspector.get_columns("filing_task_progress")]
+    )
+
+    filing_task_progress_pk = inspector.get_pk_constraint("filing_task_progress")
+    assert filing_task_progress_pk["name"] == "filing_task_progress_pkey"
+    assert filing_task_progress_pk["constrained_columns"] == ["id"]
+
+    filing_task_state_fk = inspector.get_foreign_keys("filing_task_progress")[0]
+    assert filing_task_state_fk["name"] == "filing_task_progress_filing_fkey"
+    assert (
+        ["filing"] == filing_task_state_fk["constrained_columns"]
+        and "filing" == filing_task_state_fk["referred_table"]
+        and ["id"] == filing_task_state_fk["referred_columns"]
+    )

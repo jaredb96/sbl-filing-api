@@ -46,8 +46,8 @@ class FilingTaskDAO(Base):
         return f"Name: {self.name}, Order: {self.task_order}"
 
 
-class FilingTaskStateDAO(Base):
-    __tablename__ = "filing_task_state"
+class FilingTaskProgressDAO(Base):
+    __tablename__ = "filing_task_progress"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     filing: Mapped[int] = mapped_column(ForeignKey("filing.id"))
@@ -66,7 +66,7 @@ class FilingDAO(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     filing_period: Mapped[str] = mapped_column(ForeignKey("filing_period.code"))
     lei: Mapped[str]
-    tasks: Mapped[List[FilingTaskStateDAO]] = relationship(lazy="selectin", cascade="all, delete-orphan")
+    tasks: Mapped[List[FilingTaskProgressDAO]] = relationship(lazy="selectin", cascade="all, delete-orphan")
     institution_snapshot_id: Mapped[str]
     contact_info: Mapped[str] = mapped_column(nullable=True)
 
