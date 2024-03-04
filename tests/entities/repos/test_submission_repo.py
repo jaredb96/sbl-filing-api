@@ -12,7 +12,7 @@ from entities.models import (
     FilingPeriodDTO,
     FilingDAO,
     FilingDTO,
-    FilingTaskStateDAO,
+    FilingTaskProgressDAO,
     FilingTaskDAO,
     FilingType,
     FilingTaskState,
@@ -69,7 +69,7 @@ class TestSubmissionRepo:
         transaction_session.add(filing2)
         transaction_session.add(filing3)
 
-        filing_task1 = FilingTaskStateDAO(
+        filing_task1 = FilingTaskProgressDAO(
             id=1,
             filing=1,
             task_name="Task-1",
@@ -203,7 +203,7 @@ class TestSubmissionRepo:
         assert res1.lei == "1234567890"
         assert len(res1.tasks) == 2
         assert FilingTaskState.NOT_STARTED in set([t.state for t in res1.tasks])
-        tasks1 = set([task_state.task for task_state in res1.tasks if task_state.task])
+        tasks1 = set([task_progress.task for task_progress in res1.tasks])
         assert len(tasks1) == 2
         assert "Task-1" in set([task.name for task in tasks1])
         assert "Task-2" in set([task.name for task in tasks1])
@@ -214,7 +214,7 @@ class TestSubmissionRepo:
         assert res2.lei == "ABCDEFGHIJ"
         assert len(res2.tasks) == 2
         assert FilingTaskState.NOT_STARTED in set([t.state for t in res2.tasks])
-        tasks2 = set([task_state.task for task_state in res2.tasks if task_state.task])
+        tasks2 = set([task_progress.task for task_progress in res2.tasks])
         assert len(tasks2) == 2
         assert "Task-1" in set([task.name for task in tasks2])
         assert "Task-2" in set([task.name for task in tasks2])

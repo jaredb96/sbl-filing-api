@@ -20,7 +20,7 @@ from entities.models import (
     FilingDTO,
     FilingDAO,
     FilingTaskDAO,
-    FilingTaskStateDAO,
+    FilingTaskProgressDAO,
     FilingTaskState,
 )
 
@@ -129,14 +129,14 @@ async def update_task_state(
     session: AsyncSession, lei: str, filing_period: str, task_name: str, state: FilingTaskState, user: AuthenticatedUser
 ):
     filing = await get_filing(session, lei=lei, filing_period=filing_period)
-    found_task = await query_helper(session, FilingTaskStateDAO, filing=filing.id, task_name=task_name)
+    found_task = await query_helper(session, FilingTaskProgressDAO, filing=filing.id, task_name=task_name)
     if found_task:
         task = found_task[0]  # should only be one
         task.state = state
         task.user = user.username
     else:
-        task = FilingTaskStateDAO(filing=filing.id, state=state, task_name=task_name, user=user.username)
-    await upsert_helper(session, task, FilingTaskStateDAO)
+        task = FilingTaskProgressDAO(filing=filing.id, state=state, task_name=task_name, user=user.username)
+    await upsert_helper(session, task, FilingTaskProgressDAO)
 
 
 async def upsert_helper(session: AsyncSession, original_data: Any, table_obj: T) -> T:
@@ -169,7 +169,7 @@ async def populate_missing_tasks(session: AsyncSession, filings: List[FilingDAO]
         missing_tasks = [t for t in filing_tasks if t.name not in tasks]
         for mt in missing_tasks:
             f.tasks.append(
-                FilingTaskStateDAO(
+                FilingTaskProgressDAO(
                     filing=f.id,
                     task_name=mt.name,
                     task=mt,
