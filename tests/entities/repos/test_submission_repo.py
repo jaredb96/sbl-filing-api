@@ -30,7 +30,7 @@ class TestSubmissionRepo:
     async def setup(
         self, transaction_session: AsyncSession, mocker: MockerFixture, session_generator: async_scoped_session
     ):
-        mocker.patch.object(entities_engine, "SessionLocal", return_value=session_generator)
+        mocker.patch.object(repo, "SessionLocal", return_value=session_generator)
 
         filing_task_1 = FilingTaskDAO(name="Task-1", task_order=1)
         filing_task_2 = FilingTaskDAO(name="Task-2", task_order=2)
