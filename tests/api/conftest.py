@@ -5,7 +5,14 @@ from fastapi import FastAPI
 from pytest_mock import MockerFixture
 from unittest.mock import Mock
 
-from entities.models import FilingPeriodDAO, FilingType, FilingDAO, FilingTaskProgressDAO, FilingTaskState, FilingTaskDAO
+from entities.models import (
+    FilingPeriodDAO,
+    FilingType,
+    FilingDAO,
+    FilingTaskProgressDAO,
+    FilingTaskState,
+    FilingTaskDAO,
+)
 
 from regtech_api_commons.models.auth import AuthenticatedUser
 from starlette.authentication import AuthCredentials, UnauthenticatedUser
