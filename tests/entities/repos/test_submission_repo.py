@@ -22,8 +22,6 @@ from entities.repos import submission_repo as repo
 from regtech_api_commons.models import AuthenticatedUser
 from pytest_mock import MockerFixture
 
-from entities.engine import engine as entities_engine
-
 
 class TestSubmissionRepo:
     @pytest.fixture(scope="function", autouse=True)
