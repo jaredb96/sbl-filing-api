@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List, TypeVar
-from entities.engine import get_session
+from entities.engine.engine import SessionLocal
 
 from regtech_api_commons.models import AuthenticatedUser
 
@@ -94,7 +94,7 @@ async def add_submission(session: AsyncSession, submission: SubmissionDTO) -> Su
 
 
 async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSession = None) -> SubmissionDAO:
-    session = incoming_session if incoming_session else await anext(get_session())
+    session = incoming_session if incoming_session else SessionLocal()
     async with session.begin():
         try:
             new_sub = await session.merge(submission)

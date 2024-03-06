@@ -49,7 +49,7 @@ async def upload_file(
 ):
     content = await file.read()
     await submission_processor.upload_to_storage(lei, submission_id, content, file.filename.split(".")[-1])
-    background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content)
+    background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content, background_tasks)
 
 
 @router.get("/institutions/{lei}/filings/{period_name}/submissions", response_model=List[SubmissionDTO])

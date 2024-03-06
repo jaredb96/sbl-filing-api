@@ -4,6 +4,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from pytest_mock import MockerFixture
 from unittest.mock import Mock
+import pandas as pd
 
 from entities.models import (
     FilingPeriodDAO,
@@ -122,3 +123,11 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         institution_snapshot_id="v1",
     )
     return mock
+
+
+@pytest.fixture(scope="session")
+def submission_csv(tmpdir_factory) -> str:
+    df = pd.DataFrame([["0", "1"]], columns=["Submission_Column_1", "Submission_Column_2"])
+    filename = str(tmpdir_factory.mktemp("data").join("submission.csv"))
+    df.to_csv(filename)
+    return filename

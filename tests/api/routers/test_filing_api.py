@@ -122,7 +122,25 @@ class TestFilingApi:
         mock.assert_called_with(ANY, "1234567890", "2024")
         assert res.status_code == 204
 
-    async def test_unauthed_patch_filing(self, mocker: MockerFixture, app_fixture: FastAPI):
+    def test_authed_upload_file(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, submission_csv: str
+    ):
+        mock_upload = mocker.patch("services.submission_processor.upload_to_storage")
+        mock_upload.return_value = None
+        mock_validate_submission = mocker.patch("services.submission_processor.validate_submission")
+        mock_validate_submission.return_value = None
+        files = {"file": ("submission.csv", open(submission_csv, "rb"))}
+        client = TestClient(app_fixture)
+        res = client.post("/v1/filing/123456790/submissions/1", files=files)
+        assert res.status_code == 202
+
+    def test_unauthed_upload_file(self, mocker: MockerFixture, app_fixture: FastAPI, submission_csv: str):
+        files = {"file": ("submission.csv", open(submission_csv, "rb"))}
+        client = TestClient(app_fixture)
+        res = client.post("/v1/filing/123456790/submissions/1", files=files)
+        assert res.status_code == 403
+
+    async def test_unauthed_patch_filing(self, app_fixture: FastAPI):
         client = TestClient(app_fixture)
 
         res = client.patch(

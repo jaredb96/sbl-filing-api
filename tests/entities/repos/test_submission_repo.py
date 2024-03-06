@@ -22,15 +22,13 @@ from entities.repos import submission_repo as repo
 from regtech_api_commons.models import AuthenticatedUser
 from pytest_mock import MockerFixture
 
-from entities.engine import engine as entities_engine
-
 
 class TestSubmissionRepo:
     @pytest.fixture(scope="function", autouse=True)
     async def setup(
         self, transaction_session: AsyncSession, mocker: MockerFixture, session_generator: async_scoped_session
     ):
-        mocker.patch.object(entities_engine, "SessionLocal", return_value=session_generator)
+        mocker.patch.object(repo, "SessionLocal", return_value=session_generator)
 
         filing_task_1 = FilingTaskDAO(name="Task-1", task_order=1)
         filing_task_2 = FilingTaskDAO(name="Task-2", task_order=2)
