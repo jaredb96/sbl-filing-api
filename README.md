@@ -14,9 +14,9 @@
 | src/entities/repos/submission\_repo.py |      103 |        4 |       22 |        2 |     95% |61->63, 68->70, 103-106 |
 | src/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/routers/\_\_init\_\_.py            |        2 |        0 |        0 |        0 |    100% |           |
-| src/routers/filing.py                  |       58 |        4 |       56 |        1 |     96% | 40, 50-52 |
-| src/services/submission\_processor.py  |       18 |        1 |        4 |        0 |     95% |        24 |
-|                              **TOTAL** |  **383** |   **24** |   **92** |    **4** | **94%** |           |
+| src/routers/filing.py                  |       58 |        1 |       56 |        1 |     98% |        40 |
+| src/services/submission\_processor.py  |       34 |        4 |        6 |        0 |     90% |     30-41 |
+|                              **TOTAL** |  **399** |   **24** |   **94** |    **4** | **94%** |           |
 
 3 empty files skipped.
 
