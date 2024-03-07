@@ -4,12 +4,13 @@ from datetime import datetime
 from fastapi import FastAPI
 from pytest_mock import MockerFixture
 from unittest.mock import Mock
+import pandas as pd
 
 from entities.models import (
     FilingPeriodDAO,
     FilingType,
     FilingDAO,
-    FilingTaskStateDAO,
+    FilingTaskProgressDAO,
     FilingTaskState,
     FilingTaskDAO,
     ContactInfoDAO,
@@ -75,14 +76,14 @@ def get_filing_mock(mocker: MockerFixture) -> Mock:
         id=1,
         lei="1234567890",
         tasks=[
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=1,
                 filing=1,
                 task=FilingTaskDAO(name="Task-1", task_order=1),
                 state=FilingTaskState.NOT_STARTED,
                 user="",
             ),
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=2,
                 filing=1,
                 task=FilingTaskDAO(name="Task-2", task_order=2),
@@ -116,14 +117,14 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         id=3,
         lei="ZXWVUTSRQP",
         tasks=[
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=1,
                 filing=3,
                 task=FilingTaskDAO(name="Task-1", task_order=1),
                 state=FilingTaskState.NOT_STARTED,
                 user="",
             ),
-            FilingTaskStateDAO(
+            FilingTaskProgressDAO(
                 id=2,
                 filing=3,
                 task=FilingTaskDAO(name="Task-2", task_order=2),
@@ -148,3 +149,11 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         ),
     )
     return mock
+
+
+@pytest.fixture(scope="session")
+def submission_csv(tmpdir_factory) -> str:
+    df = pd.DataFrame([["0", "1"]], columns=["Submission_Column_1", "Submission_Column_2"])
+    filename = str(tmpdir_factory.mktemp("data").join("submission.csv"))
+    df.to_csv(filename)
+    return filename

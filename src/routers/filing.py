@@ -28,11 +28,16 @@ async def get_filing_periods(request: Request):
 
 
 @router.get("/institutions/{lei}/filings/{period_name}", response_model=FilingDTO)
+@requires("authenticated")
 async def get_filing(request: Request, lei: str, period_name: str):
-    return await repo.get_filing(request.state.db_session, lei, period_name)
+    res = await repo.get_filing(request.state.db_session, lei, period_name)
+    if not res:
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+    return res
 
 
 @router.post("/institutions/{lei}/filings/{period_name}", response_model=FilingDTO)
+@requires("authenticated")
 async def post_filing(request: Request, lei: str, period_name: str, filing_obj: FilingDTO = None):
     if filing_obj:
         return await repo.upsert_filing(request.state.db_session, filing_obj)
@@ -41,12 +46,13 @@ async def post_filing(request: Request, lei: str, period_name: str, filing_obj: 
 
 
 @router.post("/{lei}/submissions/{submission_id}", status_code=HTTPStatus.ACCEPTED)
+@requires("authenticated")
 async def upload_file(
     request: Request, lei: str, submission_id: str, file: UploadFile, background_tasks: BackgroundTasks
 ):
     content = await file.read()
     await submission_processor.upload_to_storage(lei, submission_id, content, file.filename.split(".")[-1])
-    background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content)
+    background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content, background_tasks)
 
 
 @router.get("/institutions/{lei}/filings/{period_name}/submissions", response_model=List[SubmissionDTO])
@@ -56,6 +62,7 @@ async def get_submission(request: Request, lei: str, period_name: str):
 
 
 @router.get("/institutions/{lei}/filings/{period_name}/submissions/latest", response_model=SubmissionDTO)
+@requires("authenticated")
 async def get_submission_latest(request: Request, lei: str, period_name: str):
     result = await repo.get_latest_submission(request.state.db_session, lei, period_name)
     if result:

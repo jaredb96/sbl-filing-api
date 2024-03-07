@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List, TypeVar
-from entities.engine import get_session
+from entities.engine.engine import SessionLocal
 
 from regtech_api_commons.models import AuthenticatedUser
 
@@ -20,7 +20,7 @@ from entities.models import (
     FilingDTO,
     FilingDAO,
     FilingTaskDAO,
-    FilingTaskStateDAO,
+    FilingTaskProgressDAO,
     FilingTaskState,
     ContactInfoDAO,
     ContactInfoDTO,
@@ -93,6 +93,7 @@ async def add_submission(session: AsyncSession, submission: SubmissionDTO) -> Su
             filing=submission.filing,
             submitter=submission.submitter,
             state=SubmissionState.SUBMISSION_UPLOADED,
+            filename=submission.filename,
         )
         # this returns the attached object, most importantly with the new submission id
         new_sub = await session.merge(new_sub)
@@ -101,7 +102,7 @@ async def add_submission(session: AsyncSession, submission: SubmissionDTO) -> Su
 
 
 async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSession = None) -> SubmissionDAO:
-    session = incoming_session if incoming_session else await anext(get_session())
+    session = incoming_session if incoming_session else SessionLocal()
     async with session.begin():
         try:
             new_sub = await session.merge(submission)
@@ -136,14 +137,14 @@ async def update_task_state(
     session: AsyncSession, lei: str, filing_period: str, task_name: str, state: FilingTaskState, user: AuthenticatedUser
 ):
     filing = await get_filing(session, lei=lei, filing_period=filing_period)
-    found_task = await query_helper(session, FilingTaskStateDAO, filing=filing.id, task_name=task_name)
+    found_task = await query_helper(session, FilingTaskProgressDAO, filing=filing.id, task_name=task_name)
     if found_task:
         task = found_task[0]  # should only be one
         task.state = state
         task.user = user.username
     else:
-        task = FilingTaskStateDAO(filing=filing.id, state=state, task_name=task_name, user=user.username)
-    await upsert_helper(session, task, FilingTaskStateDAO)
+        task = FilingTaskProgressDAO(filing=filing.id, state=state, task_name=task_name, user=user.username)
+    await upsert_helper(session, task, FilingTaskProgressDAO)
 
 
 async def update_contact_info(
@@ -206,12 +207,13 @@ async def populate_missing_tasks(session: AsyncSession, filings: List[FilingDAO]
     filings_copy = deepcopy(filings)
     for f in filings_copy:
         tasks = [t.task.name for t in f.tasks]
-        missing_tasks = [t.name for t in filing_tasks if t.name not in tasks]
+        missing_tasks = [t for t in filing_tasks if t.name not in tasks]
         for mt in missing_tasks:
             f.tasks.append(
-                FilingTaskStateDAO(
+                FilingTaskProgressDAO(
                     filing=f.id,
-                    task_name=mt,
+                    task_name=mt.name,
+                    task=mt,
                     state=FilingTaskState.NOT_STARTED,
                     user="",
                 )

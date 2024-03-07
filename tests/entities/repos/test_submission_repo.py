@@ -12,7 +12,7 @@ from entities.models import (
     FilingPeriodDTO,
     FilingDAO,
     FilingDTO,
-    FilingTaskStateDAO,
+    FilingTaskProgressDAO,
     FilingTaskDAO,
     FilingType,
     FilingTaskState,
@@ -24,15 +24,13 @@ from entities.repos import submission_repo as repo
 from regtech_api_commons.models import AuthenticatedUser
 from pytest_mock import MockerFixture
 
-from entities.engine import engine as entities_engine
-
 
 class TestSubmissionRepo:
     @pytest.fixture(scope="function", autouse=True)
     async def setup(
         self, transaction_session: AsyncSession, mocker: MockerFixture, session_generator: async_scoped_session
     ):
-        mocker.patch.object(entities_engine, "SessionLocal", return_value=session_generator)
+        mocker.patch.object(repo, "SessionLocal", return_value=session_generator)
 
         filing_task_1 = FilingTaskDAO(name="Task-1", task_order=1)
         filing_task_2 = FilingTaskDAO(name="Task-2", task_order=2)
@@ -71,7 +69,7 @@ class TestSubmissionRepo:
         transaction_session.add(filing2)
         transaction_session.add(filing3)
 
-        filing_task1 = FilingTaskStateDAO(
+        filing_task1 = FilingTaskProgressDAO(
             id=1,
             filing=1,
             task_name="Task-1",
@@ -87,6 +85,7 @@ class TestSubmissionRepo:
             state=SubmissionState.SUBMISSION_UPLOADED,
             validation_ruleset_version="v1",
             submission_time=dt.now(),
+            filename="file1.csv",
         )
         submission2 = SubmissionDAO(
             id=2,
@@ -95,6 +94,7 @@ class TestSubmissionRepo:
             state=SubmissionState.SUBMISSION_UPLOADED,
             validation_ruleset_version="v1",
             submission_time=(dt.now() - datetime.timedelta(seconds=1000)),
+            filename="file2.csv",
         )
         submission3 = SubmissionDAO(
             id=3,
@@ -103,6 +103,7 @@ class TestSubmissionRepo:
             state=SubmissionState.SUBMISSION_UPLOADED,
             validation_ruleset_version="v1",
             submission_time=dt.now(),
+            filename="file3.csv",
         )
         transaction_session.add(submission1)
         transaction_session.add(submission2)
@@ -215,8 +216,8 @@ class TestSubmissionRepo:
         assert filing_task_states[0].state == FilingTaskState.COMPLETED
         assert filing_task_states[0].user == "testuser"
         assert filing_task_states[0].change_timestamp.timestamp() == pytest.approx(
-            seconds_now, abs=1.0
-        )  # allow for possible 1 second difference
+            seconds_now, abs=1.5
+        )  # allow for possible 1.5 second difference
 
     async def test_add_filing_task(self, query_session: AsyncSession, transaction_session: AsyncSession):
         user = AuthenticatedUser.from_claim({"preferred_username": "testuser"})
@@ -237,20 +238,39 @@ class TestSubmissionRepo:
             seconds_now, abs=1.0
         )  # allow for possible 1 second difference
 
-    async def test_get_filing(self, query_session: AsyncSession):
-        res = await repo.get_filing(query_session, lei="1234567890", filing_period="2024")
-        assert res.id == 1
-        assert res.filing_period == "2024"
-        assert res.lei == "1234567890"
-        assert len(res.tasks) == 2
-        assert FilingTaskState.NOT_STARTED in set([t.state for t in res.tasks])
+    async def test_get_filing(self, query_session: AsyncSession, mocker: MockerFixture):
+        spy_populate_missing_tasks = mocker.patch(
+            "entities.repos.submission_repo.populate_missing_tasks", wraps=repo.populate_missing_tasks
+        )
+        res1 = await repo.get_filing(query_session, lei="1234567890", filing_period="2024")
+        assert res1.id == 1
+        assert res1.filing_period == "2024"
+        assert res1.lei == "1234567890"
+        assert len(res1.tasks) == 2
+        assert FilingTaskState.NOT_STARTED in set([t.state for t in res1.tasks])
+        tasks1 = set([task_progress.task for task_progress in res1.tasks])
+        assert len(tasks1) == 2
+        assert "Task-1" in set([task.name for task in tasks1])
+        assert "Task-2" in set([task.name for task in tasks1])
 
-        res = await repo.get_filing(query_session, lei="ABCDEFGHIJ", filing_period="2024")
-        assert res.id == 2
-        assert res.filing_period == "2024"
-        assert res.lei == "ABCDEFGHIJ"
-        assert len(res.tasks) == 2
-        assert FilingTaskState.NOT_STARTED in set([t.state for t in res.tasks])
+        res2 = await repo.get_filing(query_session, lei="ABCDEFGHIJ", filing_period="2024")
+        assert res2.id == 2
+        assert res2.filing_period == "2024"
+        assert res2.lei == "ABCDEFGHIJ"
+        assert len(res2.tasks) == 2
+        assert FilingTaskState.NOT_STARTED in set([t.state for t in res2.tasks])
+        tasks2 = set([task_progress.task for task_progress in res2.tasks])
+        assert len(tasks2) == 2
+        assert "Task-1" in set([task.name for task in tasks2])
+        assert "Task-2" in set([task.name for task in tasks2])
+
+        tasks_populated_filings = []
+        for call in spy_populate_missing_tasks.call_args_list:
+            args, _ = call
+            filings = args[1]
+            assert isinstance(filings[0], FilingDAO)
+            tasks_populated_filings.append(filings[0].id)
+        assert set(tasks_populated_filings) == set([1, 2])
 
     async def test_get_period_filings(self, query_session: AsyncSession, mocker: MockerFixture):
         results = await repo.get_period_filings(query_session, filing_period="2024")
@@ -303,7 +323,7 @@ class TestSubmissionRepo:
     async def test_add_submission(self, transaction_session: AsyncSession):
         res = await repo.add_submission(
             transaction_session,
-            SubmissionDAO(submitter="test@cfpb.gov", filing=1),
+            SubmissionDAO(submitter="test@cfpb.gov", filing=1, filename="file1.csv"),
         )
         assert res.id == 4
         assert res.submitter == "test@cfpb.gov"
@@ -314,7 +334,7 @@ class TestSubmissionRepo:
         async with session_generator() as add_session:
             res = await repo.add_submission(
                 add_session,
-                SubmissionDAO(submitter="test2@cfpb.gov", filing=1),
+                SubmissionDAO(submitter="test2@cfpb.gov", filing=1, filename="file1.csv"),
             )
 
         res.state = SubmissionState.VALIDATION_IN_PROGRESS

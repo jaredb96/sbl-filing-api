@@ -14,6 +14,7 @@ class SubmissionDTO(BaseModel):
     validation_json: Dict[str, Any] | None = None
     confirmation_id: str | None = None
     submission_time: datetime | None = None
+    filename: str
 
 
 class FilingTaskDTO(BaseModel):
@@ -23,10 +24,10 @@ class FilingTaskDTO(BaseModel):
     task_order: int
 
 
-class FilingTaskStateDTO(BaseModel):
+class FilingTaskProgressDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: int | None = None
     task: FilingTaskDTO
     user: str | None = None
     state: FilingTaskState
@@ -54,7 +55,7 @@ class FilingDTO(BaseModel):
     id: int
     filing_period: str
     lei: str
-    tasks: List[FilingTaskStateDTO]
+    tasks: List[FilingTaskProgressDTO]
     institution_snapshot_id: str
 
 
