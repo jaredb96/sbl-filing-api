@@ -249,7 +249,7 @@ class TestFilingApi:
         client = TestClient(app_fixture)
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact-info")
         result = res.json()
-        
+
         assert res.status_code == 200
         assert result["id"] == 1
         assert result["first_name"] == "test_first_name_1"
