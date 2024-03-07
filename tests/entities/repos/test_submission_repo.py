@@ -419,7 +419,7 @@ class TestSubmissionRepo:
 
         filing = await repo.get_filing(query_session, lei="ABCDEFGHIJ", filing_period="2024")
         filing_contact_info = filing.contact_info
-        
+
         assert filing_contact_info.id == 2
         assert filing_contact_info.filing == 2
         assert filing_contact_info.first_name == "test_first_name_upd"
