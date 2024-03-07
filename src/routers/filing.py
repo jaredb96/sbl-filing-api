@@ -83,9 +83,13 @@ async def update_task_state(request: Request, lei: str, period_name: str, task_n
 @router.get("/institutions/{lei}/filings/{period_name}/contact-info", response_model=ContactInfoDTO)
 @requires("authenticated")
 async def get_contact_info(request: Request):
-    return await repo.get_contact_info(request.state.db_session)
+    result = await repo.get_contact_info(request.state.db_session)
+    if result:
+        return result
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 
 @router.post("/institutions/{lei}/filings/{period_name}/contact-info", response_model=ContactInfoDTO)
+@requires("authenticated")
 async def post_contact_info(request: Request, lei: str, period_name: str, contact_info: ContactInfoDTO):
     return await repo.update_contact_info(request.state.db_session, lei, period_name, contact_info)

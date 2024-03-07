@@ -162,6 +162,11 @@ class TestFilingApi:
             ANY, "1234567890", "2024", "Task-1", FilingTaskState.COMPLETED, authed_user_mock.return_value[1]
         )
 
+    async def test_unauthed_get_contact_info(self, app_fixture: FastAPI):
+        client = TestClient(app_fixture)
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact-info")
+        assert res.status_code == 403
+
     async def test_get_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("entities.repos.submission_repo.get_contact_info")
         mock.return_value = ContactInfoDAO(
@@ -193,9 +198,45 @@ class TestFilingApi:
         assert result["phone"] == "112-345-6789"
         assert result["email"] == "name_1@email.test"
 
-    def test_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI):
+    async def test_unauthed_post_contact_info(
+        self,
+        mocker: MockerFixture,
+        app_fixture: FastAPI,
+    ):
         mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
 
+        mock.return_value = ContactInfoDAO(
+            id=1,
+            filing=1,
+            first_name="test_first_name_1",
+            last_name="test_last_name_1",
+            hq_address_street_1="address street 1",
+            hq_address_street_2="",
+            hq_address_city="Test City 1",
+            hq_address_state="TS",
+            hq_address_zip="12345",
+            phone="112-345-6789",
+            email="name_1@email.test",
+        )
+        client = TestClient(app_fixture)
+        contact_info_json = {
+            "id": 1,
+            "filing": 1,
+            "first_name": "test_first_name_1",
+            "last_name": "test_last_name_1",
+            "hq_address_street_1": "address street 1",
+            "hq_address_street_2": "",
+            "hq_address_city": "Test City 1",
+            "hq_address_state": "TS",
+            "hq_address_zip": "12345",
+            "phone": "112-345-6789",
+            "email": "name_1@email.test",
+        }
+        res = client.post("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
+        assert res.status_code == 403
+
+    def test_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+        mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
         mock.return_value = ContactInfoDAO(
             id=1,
             filing=1,
