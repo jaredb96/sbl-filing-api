@@ -82,12 +82,8 @@ async def get_filing_tasks(session: AsyncSession) -> List[FilingTaskDAO]:
     return await query_helper(session, FilingTaskDAO)
 
 
-async def get_contact_info(session: AsyncSession, lei: str = None, filing_period: str = None) -> ContactInfoDAO:
-    filing_id = None
-    if lei and filing_period:
-        filing = await get_filing(session, lei=lei, filing_period=filing_period)
-        filing_id = filing.id
-    result = await query_helper(session, ContactInfoDAO, filing=filing_id)
+async def get_contact_info(session: AsyncSession) -> ContactInfoDAO:
+    result = await query_helper(session, ContactInfoDAO)
     return result[0] if result else None
 
 
@@ -150,20 +146,37 @@ async def update_task_state(
     await upsert_helper(session, task, FilingTaskStateDAO)
 
 
-async def update_contact_info(session: AsyncSession, contact_info: ContactInfoDTO) -> ContactInfoDAO:
+async def update_contact_info(
+    session: AsyncSession, lei: str, filing_period: str, new_contact_info: ContactInfoDTO
+) -> ContactInfoDAO:
+    filing = await get_filing(session, lei=lei, filing_period=filing_period)
+    found_contact_info = await query_helper(session, ContactInfoDAO, filing=filing.id)
+    if found_contact_info:
+        contact_info = found_contact_info[0]
+        contact_info = filing.contact_info
+        contact_info.first_name = new_contact_info.first_name
+        contact_info.last_name = new_contact_info.last_name
+        contact_info.hq_address_street_1 = new_contact_info.hq_address_street_1
+        contact_info.hq_address_street_2 = new_contact_info.hq_address_street_2
+        contact_info.hq_address_city = new_contact_info.hq_address_city
+        contact_info.hq_address_state = new_contact_info.hq_address_state
+        contact_info.hq_address_zip = new_contact_info.hq_address_zip
+        contact_info.email = new_contact_info.email
+        contact_info.phone = new_contact_info.phone
+    else:
+        contact_info = ContactInfoDAO(
+            filing=filing.id,
+            first_name=new_contact_info.first_name,
+            last_name=new_contact_info.last_name,
+            hq_address_street_1=new_contact_info.hq_address_street_1,
+            hq_address_street_2=new_contact_info.hq_address_street_2,
+            hq_address_city=new_contact_info.hq_address_city,
+            hq_address_state=new_contact_info.hq_address_state,
+            hq_address_zip=new_contact_info.hq_address_zip,
+            email=new_contact_info.email,
+            phone=new_contact_info.phone,
+        )
     return await upsert_helper(session, contact_info, ContactInfoDAO)
-
-
-async def add_contact_info(session: AsyncSession, contact_info: ContactInfoDTO) -> ContactInfoDAO:
-    new_contact_info = ContactInfoDAO(
-        filing=contact_info.filing,
-        first_name=contact_info.first_name,
-        last_name=contact_info.last_name,
-        phone=contact_info.phone,
-        email=contact_info.email,
-    )
-    new_contact_info = await upsert_helper(session, new_contact_info, ContactInfoDAO)
-    return new_contact_info
 
 
 async def upsert_helper(session: AsyncSession, original_data: Any, table_obj: T) -> T:

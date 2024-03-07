@@ -121,11 +121,16 @@ def test_migration_to_8eaef8ce4c23(alembic_runner: MigrationContext, alembic_eng
     assert "contact_info" in tables
     assert {
         "id",
-        "filing",
         "first_name",
         "last_name",
+        "hq_address_street_1",
+        "hq_address_street_2",
+        "hq_address_city",
+        "hq_address_state",
+        "hq_address_zip",
         "phone",
         "email",
+        "filing",
     } == set([c["name"] for c in inspector.get_columns("contact_info")])
 
     contact_info_fk = inspector.get_foreign_keys("contact_info")[0]
@@ -136,4 +141,4 @@ def test_migration_to_8eaef8ce4c23(alembic_runner: MigrationContext, alembic_eng
         and "id" in contact_info_fk["referred_columns"]
     )
 
-    assert "contact_info" not in inspector.get_columns("contact_info")
+    assert "contact_info" not in [c["name"] for c in inspector.get_columns("contact_info")]

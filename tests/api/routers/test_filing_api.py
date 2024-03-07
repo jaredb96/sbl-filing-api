@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
-from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO
+from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO, ContactInfoDTO
 
 
 class TestFilingApi:
@@ -164,32 +164,82 @@ class TestFilingApi:
 
     async def test_get_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("entities.repos.submission_repo.get_contact_info")
-        mock.return_value = [
-            ContactInfoDAO(
-                filing=1,
-                first_name="test_first_name",
-                last_name="test_last_name",
-                phone="012-345-6789",
-                email="name@email.test",
-            )
-        ]
+        mock.return_value = ContactInfoDAO(
+            id=1,
+            filing=1,
+            first_name="test_first_name_1",
+            last_name="test_last_name_1",
+            hq_address_street_1="address street 1",
+            hq_address_street_2="",
+            hq_address_city="Test City",
+            hq_address_state="TS",
+            hq_address_zip="12345",
+            phone="112-345-6789",
+            email="name_1@email.test",
+        )
 
         client = TestClient(app_fixture)
-        res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact_info")
-        results = res.json()
-        mock.assert_called_with(ANY, "1234567890", "2024")
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact-info")
+        result = res.json()
         assert res.status_code == 200
-        assert len(results) == 1
-        assert results[0]["first_name"] == "test_first_name"
-        assert results[0]["last_name"] == "test_last_name"
-        assert results[0]["phone"] == "012-345-6789"
-        assert results[0]["email"] == "name@email.test"
+        assert result["id"] == 1
+        assert result["first_name"] == "test_first_name_1"
+        assert result["last_name"] == "test_last_name_1"
+        assert result["hq_address_street_1"] == "address street 1"
+        assert result["hq_address_street_2"] == ""
+        assert result["hq_address_city"] == "Test City"
+        assert result["hq_address_state"] == "TS"
+        assert result["hq_address_zip"] == "12345"
+        assert result["phone"] == "112-345-6789"
+        assert result["email"] == "name_1@email.test"
 
-        # verify an empty contact_info list returns ok
-        mock.return_value = []
+    def test_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI):
+        mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
+
+        mock.return_value = ContactInfoDAO(
+            id=1,
+            filing=1,
+            first_name="test_first_name_1",
+            last_name="test_last_name_1",
+            hq_address_street_1="address street 1",
+            hq_address_street_2="",
+            hq_address_city="Test City 1",
+            hq_address_state="TS",
+            hq_address_zip="12345",
+            phone="112-345-6789",
+            email="name_1@email.test",
+        )
         client = TestClient(app_fixture)
-        res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact_info")
-        results = res.json()
-        mock.assert_called_with(ANY, "1234567890", "2024")
+        contact_info_json = {
+            "id": 1,
+            "filing": 1,
+            "first_name": "test_first_name_1",
+            "last_name": "test_last_name_1",
+            "hq_address_street_1": "address street 1",
+            "hq_address_street_2": "",
+            "hq_address_city": "Test City 1",
+            "hq_address_state": "TS",
+            "hq_address_zip": "12345",
+            "phone": "112-345-6789",
+            "email": "name_1@email.test",
+        }
+        res = client.post("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
+
         assert res.status_code == 200
-        assert len(results) == 0
+        mock.assert_called_with(
+            ANY,
+            "1234567890",
+            "2024",
+            ContactInfoDTO(
+                id=1,
+                first_name="test_first_name_1",
+                last_name="test_last_name_1",
+                hq_address_street_1="address street 1",
+                hq_address_street_2="",
+                hq_address_city="Test City 1",
+                hq_address_state="TS",
+                hq_address_zip="12345",
+                email="name_1@email.test",
+                phone="112-345-6789",
+            ),
+        )

@@ -36,9 +36,14 @@ class FilingTaskStateDTO(BaseModel):
 class ContactInfoDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int | None = None
+    id: int
     first_name: str
     last_name: str
+    hq_address_street_1: str
+    hq_address_street_2: str | None = None
+    hq_address_city: str
+    hq_address_state: str
+    hq_address_zip: str
     email: str
     phone: str
 

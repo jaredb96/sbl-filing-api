@@ -80,15 +80,12 @@ async def update_task_state(request: Request, lei: str, period_name: str, task_n
     await repo.update_task_state(request.state.db_session, lei, period_name, task_name, state.state, request.user)
 
 
-@router.get("/institutions/{lei}/filings/{period_name}/contact_info", response_model=List[ContactInfoDTO])
+@router.get("/institutions/{lei}/filings/{period_name}/contact-info", response_model=ContactInfoDTO)
 @requires("authenticated")
-async def get_contact_info(request: Request, lei: str, period_name: str):
-    return await repo.get_contact_info(request.state.db_session, lei, period_name)
+async def get_contact_info(request: Request):
+    return await repo.get_contact_info(request.state.db_session)
 
 
-@router.post("/institutions/{lei}/filings/{period_name}/contact_info", response_model=ContactInfoDTO)
-async def post_contact_info(request: Request, lei: str, period_name: str, contact_info_obj: ContactInfoDTO = None):
-    if contact_info_obj:
-        return await repo.update_contact_info(request.state.db_session, contact_info_obj)
-    else:
-        return await repo.add_contact_info(request.state.db_session, contact_info_obj)
+@router.post("/institutions/{lei}/filings/{period_name}/contact-info", response_model=ContactInfoDTO)
+async def post_contact_info(request: Request, lei: str, period_name: str, contact_info: ContactInfoDTO):
+    return await repo.update_contact_info(request.state.db_session, lei, period_name, contact_info)

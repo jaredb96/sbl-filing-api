@@ -12,6 +12,7 @@ from entities.models import (
     FilingTaskStateDAO,
     FilingTaskState,
     FilingTaskDAO,
+    ContactInfoDAO,
 )
 
 from regtech_api_commons.models.auth import AuthenticatedUser
@@ -91,6 +92,19 @@ def get_filing_mock(mocker: MockerFixture) -> Mock:
         ],
         filing_period="2024",
         institution_snapshot_id="v1",
+        contact_info=ContactInfoDAO(
+            id=1,
+            filing=1,
+            first_name="test_first_name_1",
+            last_name="test_last_name_1",
+            hq_address_street_1="address street 1",
+            hq_address_street_2="address street 2",
+            hq_address_city="Test City",
+            hq_address_state="TS",
+            hq_address_zip="12345",
+            phone="112-345-6789",
+            email="test1@cfpb.gov",
+        ),
     )
     return mock
 
@@ -119,5 +133,18 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         ],
         filing_period="2024",
         institution_snapshot_id="v1",
+        contact_info=ContactInfoDAO(
+            id=3,
+            filing=3,
+            first_name="test_first_name_3",
+            last_name="test_last_name_3",
+            hq_address_street_1="address street 1",
+            hq_address_street_2="",
+            hq_address_city="Test City",
+            hq_address_state="TS",
+            hq_address_zip="12345",
+            phone="312-345-6789",
+            email="test3@cfpb.gov",
+        ),
     )
     return mock
