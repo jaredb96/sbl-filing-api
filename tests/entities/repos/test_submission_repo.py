@@ -417,9 +417,9 @@ class TestSubmissionRepo:
         assert filing_contact_info.phone == "312-345-6789"
         assert filing_contact_info.email == "test3@cfpb.gov"
 
-    async def test_update_contact_info(self, query_session: AsyncSession, transaction_session: AsyncSession):
+    async def test_update_contact_info(self, transaction_session: AsyncSession):
         await repo.update_contact_info(
-            query_session,
+            transaction_session,
             lei="ABCDEFGHIJ",
             filing_period="2024",
             new_contact_info=ContactInfoDTO(
@@ -437,7 +437,7 @@ class TestSubmissionRepo:
             ),
         )
 
-        filing = await repo.get_filing(query_session, lei="ABCDEFGHIJ", filing_period="2024")
+        filing = await repo.get_filing(transaction_session, lei="ABCDEFGHIJ", filing_period="2024")
         filing_contact_info = filing.contact_info
 
         assert filing_contact_info.id == 2
