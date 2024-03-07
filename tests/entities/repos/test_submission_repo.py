@@ -135,14 +135,6 @@ class TestSubmissionRepo:
             phone="212-345-6789",
             email="test2@cfpb.gov",
         )
-        """contact_info3 = ContactInfoDAO(
-            id=3,
-            filing=2,
-            first_name="test_first_name_3",
-            last_name="test_last_name_3",
-            phone="312-345-6789",
-            email="test3@cfpb.gov",
-        )"""
         transaction_session.add(contact_info1)
         transaction_session.add(contact_info2)
         # transaction_session.add(contact_info3)
@@ -369,18 +361,18 @@ class TestSubmissionRepo:
         await query_updated_dao()
 
     async def test_get_contact_info(self, query_session: AsyncSession):
-        res = await repo.get_contact_info(query_session)
-        assert res.id == 1
-        assert res.filing == 1
-        assert res.first_name == "test_first_name_1"
-        assert res.last_name == "test_last_name_1"
-        assert res.hq_address_street_1 == "address street 1"
+        res = await repo.get_contact_info(session=query_session, lei="ABCDEFGHIJ", filing_period="2024")
+        assert res.id == 2
+        assert res.filing == 2
+        assert res.first_name == "test_first_name_2"
+        assert res.last_name == "test_last_name_2"
+        assert res.hq_address_street_1 == "address street 2"
         assert res.hq_address_street_2 == ""
-        assert res.hq_address_city == "Test City 1"
+        assert res.hq_address_city == "Test City 2"
         assert res.hq_address_state == "TS"
         assert res.hq_address_zip == "12345"
-        assert res.phone == "112-345-6789"
-        assert res.email == "test1@cfpb.gov"
+        assert res.phone == "212-345-6789"
+        assert res.email == "test2@cfpb.gov"
 
     async def test_create_contact_info(self, transaction_session: AsyncSession):
         await repo.update_contact_info(
@@ -388,8 +380,6 @@ class TestSubmissionRepo:
             lei="ZYXWVUTSRQP",
             filing_period="2024",
             new_contact_info=ContactInfoDTO(
-                id=3,
-                filing=3,
                 first_name="test_first_name_3",
                 last_name="test_last_name_3",
                 hq_address_street_1="address street 1",
@@ -402,6 +392,7 @@ class TestSubmissionRepo:
             ),
         )
 
+        # Testing to make sure the newly created contact_info is linked to the correct filing.
         filing = await repo.get_filing(transaction_session, lei="ZYXWVUTSRQP", filing_period="2024")
         filing_contact_info = filing.contact_info
 
@@ -437,6 +428,7 @@ class TestSubmissionRepo:
             ),
         )
 
+        # Testing to make sure the filing contact_info is updated
         filing = await repo.get_filing(transaction_session, lei="ABCDEFGHIJ", filing_period="2024")
         filing_contact_info = filing.contact_info
 

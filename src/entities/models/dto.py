@@ -37,7 +37,7 @@ class FilingTaskProgressDTO(BaseModel):
 class ContactInfoDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: int | None = None
     first_name: str
     last_name: str
     hq_address_street_1: str
@@ -57,6 +57,7 @@ class FilingDTO(BaseModel):
     lei: str
     tasks: List[FilingTaskProgressDTO]
     institution_snapshot_id: str
+    contact_info: ContactInfoDTO | None = None
 
 
 class FilingPeriodDTO(BaseModel):
