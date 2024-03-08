@@ -262,6 +262,11 @@ class TestFilingApi:
         assert result["phone"] == "112-345-6789"
         assert result["email"] == "name_1@email.test"
 
+        # no contact_info for endpoint
+        mock.return_value = None
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact-info")
+        assert res.status_code == 204
+
     async def test_unauthed_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, unauthed_user_mock):
         contact_info_json = {
             "id": 1,
