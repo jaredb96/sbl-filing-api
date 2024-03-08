@@ -8,16 +8,16 @@
 | src/entities/engine/\_\_init\_\_.py    |        2 |        0 |        0 |        0 |    100% |           |
 | src/entities/engine/engine.py          |       10 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/\_\_init\_\_.py    |        4 |        0 |        0 |        0 |    100% |           |
-| src/entities/models/dao.py             |       58 |        4 |        0 |        0 |     93% |28, 47, 62, 75 |
-| src/entities/models/dto.py             |       47 |        0 |        0 |        0 |    100% |           |
+| src/entities/models/dao.py             |       73 |        5 |        0 |        0 |     93% |28, 47, 62, 80, 93 |
+| src/entities/models/dto.py             |       59 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/model\_enums.py    |       14 |        0 |        0 |        0 |    100% |           |
-| src/entities/repos/submission\_repo.py |      103 |        4 |       22 |        2 |     95% |61->63, 68->70, 104-107 |
+| src/entities/repos/submission\_repo.py |      110 |        4 |       22 |        2 |     95% |63->65, 70->72, 111-114 |
 | src/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/routers/\_\_init\_\_.py            |        2 |        0 |        0 |        0 |    100% |           |
-| src/routers/filing.py                  |       61 |        1 |       58 |        1 |     98% |        43 |
+| src/routers/filing.py                  |       72 |        1 |       72 |        1 |     99% |        43 |
 | src/services/lei\_verifier.py          |        9 |        0 |        2 |        1 |     91% |  11->exit |
 | src/services/submission\_processor.py  |       34 |        4 |        6 |        0 |     90% |     30-41 |
-|                              **TOTAL** |  **414** |   **24** |   **98** |    **5** | **94%** |           |
+|                              **TOTAL** |  **459** |   **25** |  **112** |    **5** | **95%** |           |
 
 3 empty files skipped.
 

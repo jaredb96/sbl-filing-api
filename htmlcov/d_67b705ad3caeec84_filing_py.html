@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for src/routers/filing.py: 98%</title>
+    <title>Coverage for src/routers/filing.py: 99%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>src/routers/filing.py</b>:
-            <span class="pc_cov">98%</span>
+            <span class="pc_cov">99%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
             </div>
         </aside>
         <h2>
-            <span class="text">61 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">60<span class="text"> run</span></button>
+            <span class="text">72 statements &nbsp;</span>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">71<span class="text"> run</span></button>
             <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">1<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
             <button type="button" class="par run show_par button_toggle_par" value="par" data-shortcut="p" title="Toggle lines partially run">1<span class="text"> partial</span></button>
@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="d_67f6f9a13eff1831_lei_verifier_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.3">coverage.py v7.4.3</a>,
-            created at 2024-03-06 22:49 +0000
+            created at 2024-03-08 17:06 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -90,7 +90,7 @@
     <p class="run"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">typing</span> <span class="key">import</span> <span class="nam">Annotated</span><span class="op">,</span> <span class="nam">List</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="key">from</span> <span class="nam">entities</span><span class="op">.</span><span class="nam">engine</span> <span class="key">import</span> <span class="nam">get_session</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">entities</span><span class="op">.</span><span class="nam">models</span> <span class="key">import</span> <span class="nam">FilingPeriodDTO</span><span class="op">,</span> <span class="nam">SubmissionDTO</span><span class="op">,</span> <span class="nam">FilingDTO</span><span class="op">,</span> <span class="nam">UpdateValueDTO</span><span class="op">,</span> <span class="nam">StateUpdateDTO</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t"><span class="key">from</span> <span class="nam">entities</span><span class="op">.</span><span class="nam">models</span> <span class="key">import</span> <span class="nam">FilingPeriodDTO</span><span class="op">,</span> <span class="nam">SubmissionDTO</span><span class="op">,</span> <span class="nam">FilingDTO</span><span class="op">,</span> <span class="nam">UpdateValueDTO</span><span class="op">,</span> <span class="nam">StateUpdateDTO</span><span class="op">,</span> <span class="nam">ContactInfoDTO</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="key">from</span> <span class="nam">entities</span><span class="op">.</span><span class="nam">repos</span> <span class="key">import</span> <span class="nam">submission_repo</span> <span class="key">as</span> <span class="nam">repo</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">sqlalchemy</span><span class="op">.</span><span class="nam">ext</span><span class="op">.</span><span class="nam">asyncio</span> <span class="key">import</span> <span class="nam">AsyncSession</span>&nbsp;</span><span class="r"></span></p>
@@ -169,6 +169,21 @@
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t"><span class="op">@</span><span class="nam">requires</span><span class="op">(</span><span class="str">"authenticated"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">update_task_state</span><span class="op">(</span><span class="nam">request</span><span class="op">:</span> <span class="nam">Request</span><span class="op">,</span> <span class="nam">lei</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">task_name</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">state</span><span class="op">:</span> <span class="nam">StateUpdateDTO</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">    <span class="key">await</span> <span class="nam">repo</span><span class="op">.</span><span class="nam">update_task_state</span><span class="op">(</span><span class="nam">request</span><span class="op">.</span><span class="nam">state</span><span class="op">.</span><span class="nam">db_session</span><span class="op">,</span> <span class="nam">lei</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">,</span> <span class="nam">task_name</span><span class="op">,</span> <span class="nam">state</span><span class="op">.</span><span class="nam">state</span><span class="op">,</span> <span class="nam">request</span><span class="op">.</span><span class="nam">user</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"/institutions/{lei}/filings/{period_name}/contact-info"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">ContactInfoDTO</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t"><span class="op">@</span><span class="nam">requires</span><span class="op">(</span><span class="str">"authenticated"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t92" href="#t92">92</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">get_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">:</span> <span class="nam">Request</span><span class="op">,</span> <span class="nam">lei</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">:</span> <span class="nam">str</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t93" href="#t93">93</a></span><span class="t">    <span class="nam">result</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">repo</span><span class="op">.</span><span class="nam">get_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">.</span><span class="nam">state</span><span class="op">.</span><span class="nam">db_session</span><span class="op">,</span> <span class="nam">lei</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t94" href="#t94">94</a></span><span class="t">    <span class="key">if</span> <span class="nam">result</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t95" href="#t95">95</a></span><span class="t">        <span class="key">return</span> <span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t96" href="#t96">96</a></span><span class="t">    <span class="key">return</span> <span class="nam">JSONResponse</span><span class="op">(</span><span class="nam">status_code</span><span class="op">=</span><span class="nam">status</span><span class="op">.</span><span class="nam">HTTP_204_NO_CONTENT</span><span class="op">,</span> <span class="nam">content</span><span class="op">=</span><span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t97" href="#t97">97</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t98" href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/institutions/{lei}/filings/{period_name}/contact-info"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">ContactInfoDTO</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t"><span class="op">@</span><span class="nam">requires</span><span class="op">(</span><span class="str">"authenticated"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">post_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">:</span> <span class="nam">Request</span><span class="op">,</span> <span class="nam">lei</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">contact_info</span><span class="op">:</span> <span class="nam">ContactInfoDTO</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">    <span class="key">return</span> <span class="key">await</span> <span class="nam">repo</span><span class="op">.</span><span class="nam">update_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">.</span><span class="nam">state</span><span class="op">.</span><span class="nam">db_session</span><span class="op">,</span> <span class="nam">lei</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">,</span> <span class="nam">contact_info</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
@@ -178,7 +193,7 @@
             <a id="nextFileLink" class="nav" href="d_67f6f9a13eff1831_lei_verifier_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.3">coverage.py v7.4.3</a>,
-            created at 2024-03-06 22:49 +0000
+            created at 2024-03-08 17:06 +0000
         </p>
     </div>
 </footer>
