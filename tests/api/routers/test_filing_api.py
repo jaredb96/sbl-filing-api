@@ -1,5 +1,6 @@
 import datetime
 import httpx
+import os
 import pytest
 
 from copy import deepcopy
@@ -12,7 +13,7 @@ from pytest_mock import MockerFixture
 
 from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO, ContactInfoDTO
 
-from services import lei_verifier
+from routers.dependencies import verify_lei
 
 
 class TestFilingApi:
@@ -248,12 +249,24 @@ class TestFilingApi:
             ANY, "1234567890", "2024", "Task-1", FilingTaskState.COMPLETED, authed_user_mock.return_value[1]
         )
 
+    def test_user_lei_association(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, get_filing_mock: Mock
+    ):
+        mocker.patch.dict(os.environ, {"ENV": "TEST"})
+        client = TestClient(app_fixture)
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/")
+        assert res.status_code == 403
+        assert res.json()["detail"] == "LEI 1234567890 is not associated with the user."
+
+        res = client.get("/v1/filing/institutions/123456ABCDEF/filings/2024/")
+        assert res.status_code == 200
+
     def test_verify_lei_dependency(self, mocker: MockerFixture):
-        mock_user_fi_service = mocker.patch("services.lei_verifier.httpx.get")
+        mock_user_fi_service = mocker.patch("routers.dependencies.httpx.get")
         mock_user_fi_service.return_value = httpx.Response(200, json={"is_active": False})
         with pytest.raises(HTTPException) as http_exc:
             request = Request(scope={"type": "http", "headers": [(b"authorization", b"123")]})
-            lei_verifier.verify_lei(request=request, lei="1234567890")
+            verify_lei(request=request, lei="1234567890")
         assert isinstance(http_exc.value, HTTPException)
         assert http_exc.value.status_code == 403
         assert http_exc.value.detail == "LEI 1234567890 is in an inactive state."

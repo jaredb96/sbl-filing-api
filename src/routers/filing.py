@@ -13,12 +13,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette.authentication import requires
 
+from .dependencies import verify_user_lei_relation
+
 
 async def set_db(request: Request, session: Annotated[AsyncSession, Depends(get_session)]):
     request.state.db_session = session
 
 
-router = Router(dependencies=[Depends(set_db)])
+router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)])
 
 
 @router.get("/periods", response_model=List[FilingPeriodDTO])

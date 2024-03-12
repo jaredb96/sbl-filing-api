@@ -1,4 +1,5 @@
 import httpx
+import os
 
 from config import settings
 from http import HTTPStatus
@@ -10,3 +11,10 @@ def verify_lei(request: Request, lei: str) -> None:
     lei_obj = res.json()
     if not lei_obj["is_active"]:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=f"LEI {lei} is in an inactive state.")
+
+
+def verify_user_lei_relation(request: Request, lei: str = None) -> None:
+    if os.getenv("ENV", "LOCAL") != "LOCAL" and lei:
+        institutions = request.user.institutions
+        if lei not in institutions:
+            raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=f"LEI {lei} is not associated with the user.")
