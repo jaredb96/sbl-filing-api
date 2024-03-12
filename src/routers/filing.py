@@ -6,7 +6,7 @@ from services import submission_processor
 from typing import Annotated, List
 
 from entities.engine import get_session
-from entities.models import FilingPeriodDTO, SubmissionDTO, FilingDTO, UpdateValueDTO, StateUpdateDTO, ContactInfoDTO
+from entities.models import FilingPeriodDTO, SubmissionDTO, FilingDTO, SnapshotUpdateDTO, StateUpdateDTO, ContactInfoDTO
 from entities.repos import submission_repo as repo
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -79,14 +79,13 @@ async def get_submission(request: Request, id: str):
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 
-@router.patch("/institutions/{lei}/filings/{period_name}/fields/{field_name}", response_model=FilingDTO)
+@router.put("/institutions/{lei}/filings/{period_name}/institution-snapshot-id", response_model=FilingDTO)
 @requires("authenticated")
-async def patch_filing(request: Request, lei: str, period_name: str, field_name: str, update_value: UpdateValueDTO):
+async def put_institution_snapshot(request: Request, lei: str, period_name: str, update_value: SnapshotUpdateDTO):
     result = await repo.get_filing(request.state.db_session, lei, period_name)
     if result:
-        if getattr(result, field_name, None):
-            setattr(result, field_name, update_value.value)
-            return await repo.upsert_filing(request.state.db_session, result)
+        result.institution_snapshot_id = update_value.institution_snapshot_id
+        return await repo.upsert_filing(request.state.db_session, result)
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 

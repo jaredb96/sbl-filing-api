@@ -71,10 +71,10 @@ class FilingPeriodDTO(BaseModel):
     filing_type: FilingType
 
 
-class UpdateValueDTO(BaseModel):
+class SnapshotUpdateDTO(BaseModel):
     model_config = ConfigDict(from_attribute=True)
 
-    value: str | int | float | bool
+    institution_snapshot_id: str
 
 
 class StateUpdateDTO(BaseModel):

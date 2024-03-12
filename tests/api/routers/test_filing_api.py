@@ -180,8 +180,9 @@ class TestFilingApi:
     async def test_unauthed_patch_filing(self, app_fixture: FastAPI):
         client = TestClient(app_fixture)
 
-        res = client.patch(
-            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": "v3"}
+        res = client.put(
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
+            json={"institution_snapshot_id": "v3"},
         )
         assert res.status_code == 403
 
@@ -199,25 +200,30 @@ class TestFilingApi:
 
         # no existing filing for endpoint
         get_filing_mock.return_value = None
-        res = client.patch(
-            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": "v3"}
+        res = client.put(
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
+            json={"institution_snapshot_id": "v3"},
         )
         assert res.status_code == 204
 
         # no known field for endpoint
         get_filing_mock.return_value = filing_return
-        res = client.patch("/v1/filing/institutions/1234567890/filings/2024/fields/unknown_field", json={"value": "v3"})
-        assert res.status_code == 204
+        res = client.put(
+            "/v1/filing/institutions/1234567890/filings/2024/unknown_field", json={"institution_snapshot_id": "v3"}
+        )
+        assert res.status_code == 404
 
         # unallowed value data type
-        res = client.patch(
-            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": ["1", "2"]}
+        res = client.put(
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
+            json={"institution_snapshot_id": ["1", "2"]},
         )
         assert res.status_code == 422
 
         # good
-        res = client.patch(
-            "/v1/filing/institutions/1234567890/filings/2025/fields/institution_snapshot_id", json={"value": "v3"}
+        res = client.put(
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
+            json={"institution_snapshot_id": "v3"},
         )
         assert res.status_code == 200
         assert res.json()["institution_snapshot_id"] == "v3"

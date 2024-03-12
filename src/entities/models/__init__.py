@@ -13,7 +13,7 @@ __all__ = [
     "FilingPeriodDTO",
     "FilingType",
     "FilingTaskState",
-    "UpdateValueDTO",
+    "SnapshotUpdateDTO",
     "StateUpdateDTO",
     "ContactInfoDAO",
     "ContactInfoDTO",
@@ -26,7 +26,7 @@ from .dto import (
     FilingPeriodDTO,
     FilingTaskProgressDTO,
     FilingTaskDTO,
-    UpdateValueDTO,
+    SnapshotUpdateDTO,
     StateUpdateDTO,
     ContactInfoDTO,
 )
