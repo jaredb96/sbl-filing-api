@@ -181,7 +181,7 @@ class TestFilingApi:
         client = TestClient(app_fixture)
 
         res = client.put(
-            "/v1/filing/institutions/1234567890/filings/2025/institution_snapshot_id",
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
             json={"institution_snapshot_id": "v3"},
         )
         assert res.status_code == 403
@@ -201,7 +201,7 @@ class TestFilingApi:
         # no existing filing for endpoint
         get_filing_mock.return_value = None
         res = client.put(
-            "/v1/filing/institutions/1234567890/filings/2025/institution_snapshot_id",
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
             json={"institution_snapshot_id": "v3"},
         )
         assert res.status_code == 204
@@ -215,14 +215,14 @@ class TestFilingApi:
 
         # unallowed value data type
         res = client.put(
-            "/v1/filing/institutions/1234567890/filings/2025/institution_snapshot_id",
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
             json={"institution_snapshot_id": ["1", "2"]},
         )
         assert res.status_code == 422
 
         # good
         res = client.put(
-            "/v1/filing/institutions/1234567890/filings/2025/institution_snapshot_id",
+            "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
             json={"institution_snapshot_id": "v3"},
         )
         assert res.status_code == 200

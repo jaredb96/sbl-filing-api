@@ -79,9 +79,9 @@ async def get_submission(request: Request, id: str):
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 
-@router.put("/institutions/{lei}/filings/{period_name}/institution_snapshot_id", response_model=FilingDTO)
+@router.put("/institutions/{lei}/filings/{period_name}/institution-snapshot-id", response_model=FilingDTO)
 @requires("authenticated")
-async def patch_filing(request: Request, lei: str, period_name: str, update_value: SnapshotUpdateDTO):
+async def put_institution_snapshot(request: Request, lei: str, period_name: str, update_value: SnapshotUpdateDTO):
     result = await repo.get_filing(request.state.db_session, lei, period_name)
     if result:
         result.institution_snapshot_id = update_value.institution_snapshot_id
