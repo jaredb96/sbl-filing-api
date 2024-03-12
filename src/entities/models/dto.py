@@ -55,7 +55,7 @@ class FilingDTO(BaseModel):
     id: int
     filing_period: str
     lei: str
-    tasks: List[FilingTaskProgressDTO]
+    tasks: List[FilingTaskProgressDTO] | None = None
     institution_snapshot_id: str
     contact_info: ContactInfoDTO | None = None
 

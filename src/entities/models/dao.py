@@ -85,7 +85,7 @@ class FilingDAO(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     filing_period: Mapped[str] = mapped_column(ForeignKey("filing_period.code"))
     lei: Mapped[str]
-    tasks: Mapped[List[FilingTaskProgressDAO]] = relationship(lazy="selectin", cascade="all, delete-orphan")
+    tasks: Mapped[List[FilingTaskProgressDAO] | None] = relationship(lazy="selectin", cascade="all, delete-orphan")
     institution_snapshot_id: Mapped[str]
     contact_info: Mapped[ContactInfoDAO] = relationship("ContactInfoDAO", lazy="joined")
 
