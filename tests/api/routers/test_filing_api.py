@@ -250,10 +250,18 @@ class TestFilingApi:
         )
 
     def test_user_lei_association(
-        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, get_filing_mock: Mock
+        self,
+        mocker: MockerFixture,
+        app_fixture: FastAPI,
+        authed_user_mock: Mock,
+        get_filing_mock: Mock,
+        get_filing_period_mock: Mock,
     ):
         mocker.patch.dict(os.environ, {"ENV": "TEST"})
         client = TestClient(app_fixture)
+        res = client.get("/v1/filing/periods")
+        assert res.status_code == 200
+
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/")
         assert res.status_code == 403
         assert res.json()["detail"] == "LEI 1234567890 is not associated with the user."
