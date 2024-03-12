@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="d_3c53b0a946abe0df_dto_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.3">coverage.py v7.4.3</a>,
-            created at 2024-03-12 17:56 +0000
+            created at 2024-03-12 17:57 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -169,7 +169,7 @@
     <p class="run"><span class="n"><a id="t85" href="#t85">85</a></span><span class="t">    <span class="nam">id</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">int</span><span class="op">]</span> <span class="op">=</span> <span class="nam">mapped_column</span><span class="op">(</span><span class="nam">primary_key</span><span class="op">=</span><span class="key">True</span><span class="op">,</span> <span class="nam">autoincrement</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t86" href="#t86">86</a></span><span class="t">    <span class="nam">filing_period</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">str</span><span class="op">]</span> <span class="op">=</span> <span class="nam">mapped_column</span><span class="op">(</span><span class="nam">ForeignKey</span><span class="op">(</span><span class="str">"filing_period.code"</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t87" href="#t87">87</a></span><span class="t">    <span class="nam">lei</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">str</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">    <span class="nam">tasks</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">List</span><span class="op">[</span><span class="nam">FilingTaskProgressDAO</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="nam">relationship</span><span class="op">(</span><span class="nam">lazy</span><span class="op">=</span><span class="str">"selectin"</span><span class="op">,</span> <span class="nam">cascade</span><span class="op">=</span><span class="str">"all, delete-orphan"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t88" href="#t88">88</a></span><span class="t">    <span class="nam">tasks</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">List</span><span class="op">[</span><span class="nam">FilingTaskProgressDAO</span><span class="op">]</span> <span class="op">|</span> <span class="key">None</span><span class="op">]</span> <span class="op">=</span> <span class="nam">relationship</span><span class="op">(</span><span class="nam">lazy</span><span class="op">=</span><span class="str">"selectin"</span><span class="op">,</span> <span class="nam">cascade</span><span class="op">=</span><span class="str">"all, delete-orphan"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t89" href="#t89">89</a></span><span class="t">    <span class="nam">institution_snapshot_id</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">str</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t90" href="#t90">90</a></span><span class="t">    <span class="nam">contact_info</span><span class="op">:</span> <span class="nam">Mapped</span><span class="op">[</span><span class="nam">ContactInfoDAO</span><span class="op">]</span> <span class="op">=</span> <span class="nam">relationship</span><span class="op">(</span><span class="str">"ContactInfoDAO"</span><span class="op">,</span> <span class="nam">lazy</span><span class="op">=</span><span class="str">"joined"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t91" href="#t91">91</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -207,7 +207,7 @@
             <a id="nextFileLink" class="nav" href="d_3c53b0a946abe0df_dto_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.3">coverage.py v7.4.3</a>,
-            created at 2024-03-12 17:56 +0000
+            created at 2024-03-12 17:57 +0000
         </p>
     </div>
 </footer>
