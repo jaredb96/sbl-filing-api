@@ -17,11 +17,17 @@ log = logging.getLogger(__name__)
 def validate_file_processable(file: UploadFile) -> None:
     extension = file.filename.split(".")[-1].lower()
     if file.content_type != settings.submission_file_type or extension != settings.submission_file_extension:
-        raise HTTPException(status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE, detail="Only CSV supported")
+        raise HTTPException(
+            status_code=HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
+            detail=(
+                f"Only {settings.submission_file_type} file type with extension {settings.submission_file_extension} is supported; "
+                f'submitted file is "{file.content_type}" with "{extension}" extension',
+            ),
+        )
     if file.size > settings.submission_file_size:
         raise HTTPException(
             status_code=HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
-            detail=f"File size limit {settings.submission_file_size} exceeded.",
+            detail=f"Uploaded file size of {file.size} bytes exceeds the limit of {settings.submission_file_size} bytes.",
         )
 
 
