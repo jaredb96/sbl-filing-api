@@ -4,7 +4,7 @@
 
 | Name                                   |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
 |--------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| src/config.py                          |       37 |        0 |        8 |        1 |     98% |    13->17 |
+| src/config.py                          |       40 |        0 |        8 |        1 |     98% |    13->17 |
 | src/entities/engine/\_\_init\_\_.py    |        2 |        0 |        0 |        0 |    100% |           |
 | src/entities/engine/engine.py          |       10 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/\_\_init\_\_.py    |        4 |        0 |        0 |        0 |    100% |           |
@@ -15,9 +15,9 @@
 | src/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/routers/\_\_init\_\_.py            |        2 |        0 |        0 |        0 |    100% |           |
 | src/routers/dependencies.py            |       15 |        0 |        6 |        1 |     95% |  12->exit |
-| src/routers/filing.py                  |       81 |        0 |       76 |        0 |    100% |           |
-| src/services/submission\_processor.py  |       34 |        4 |        6 |        0 |     90% |     30-41 |
-|                              **TOTAL** |  **474** |   **24** |  **120** |    **4** | **95%** |           |
+| src/routers/filing.py                  |       82 |        0 |       76 |        0 |    100% |           |
+| src/services/submission\_processor.py  |       40 |        4 |       10 |        0 |     92% |     47-58 |
+|                              **TOTAL** |  **484** |   **24** |  **124** |    **4** | **95%** |           |
 
 3 empty files skipped.
 
