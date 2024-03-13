@@ -45,12 +45,13 @@ async def post_filing(request: Request, lei: str, period_name: str, filing_obj: 
         return await repo.create_new_filing(request.state.db_session, lei, period_name)
 
 
-@router.post("/{lei}/submissions/{submission_id}", status_code=HTTPStatus.ACCEPTED)
+@router.post("/institutions/{lei}/filings/{period_name}/submissions", response_model=SubmissionDTO)
 @requires("authenticated")
 async def upload_file(
     request: Request, lei: str, submission_id: str, file: UploadFile, background_tasks: BackgroundTasks
-):
+) -> SubmissionDTO:
     content = await file.read()
+    res = await repo.add_submission(request.state.db_session, SubmissionDTO(submitter=submission_id, filename=file.filename))
     await submission_processor.upload_to_storage(lei, submission_id, content, file.filename.split(".")[-1])
     background_tasks.add_task(submission_processor.validate_submission, lei, submission_id, content, background_tasks)
 
