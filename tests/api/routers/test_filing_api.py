@@ -1,4 +1,5 @@
 import datetime
+from http import HTTPStatus
 import httpx
 import os
 import pytest
@@ -160,12 +161,12 @@ class TestFilingApi:
 
         client = TestClient(app_fixture)
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/1")
-        mock.assert_called_with(ANY, "1")
+        mock.assert_called_with(ANY, 1)
         assert res.status_code == 200
 
         mock.return_value = None
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/1")
-        mock.assert_called_with(ANY, "1")
+        mock.assert_called_with(ANY, 1)
         assert res.status_code == 204
 
     def test_authed_upload_file(
@@ -185,6 +186,26 @@ class TestFilingApi:
         client = TestClient(app_fixture)
         res = client.post("/v1/filing/123456790/submissions/1", files=files)
         assert res.status_code == 403
+
+    def test_upload_file_invalid_type(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, submission_csv: str
+    ):
+        mock = mocker.patch("services.submission_processor.validate_file_processable")
+        mock.side_effect = HTTPException(HTTPStatus.UNSUPPORTED_MEDIA_TYPE)
+        client = TestClient(app_fixture)
+        files = {"file": ("submission.csv", open(submission_csv, "rb"))}
+        res = client.post("/v1/filing/123456790/submissions/1", files=files)
+        assert res.status_code == HTTPStatus.UNSUPPORTED_MEDIA_TYPE
+
+    def test_upload_file_invalid_size(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, submission_csv: str
+    ):
+        mock = mocker.patch("services.submission_processor.validate_file_processable")
+        mock.side_effect = HTTPException(HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
+        client = TestClient(app_fixture)
+        files = {"file": ("submission.csv", open(submission_csv, "rb"))}
+        res = client.post("/v1/filing/123456790/submissions/1", files=files)
+        assert res.status_code == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
 
     async def test_unauthed_patch_filing(self, app_fixture: FastAPI):
         client = TestClient(app_fixture)
