@@ -14,10 +14,10 @@
 | src/entities/repos/submission\_repo.py |      110 |        4 |       22 |        2 |     95% |63->65, 70->72, 111-114 |
 | src/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/routers/\_\_init\_\_.py            |        2 |        0 |        0 |        0 |    100% |           |
-| src/routers/filing.py                  |       80 |        0 |       76 |        0 |    100% |           |
-| src/services/lei\_verifier.py          |        9 |        0 |        2 |        1 |     91% |  11->exit |
+| src/routers/dependencies.py            |       15 |        0 |        6 |        1 |     95% |  12->exit |
+| src/routers/filing.py                  |       81 |        0 |       76 |        0 |    100% |           |
 | src/services/submission\_processor.py  |       34 |        4 |        6 |        0 |     90% |     30-41 |
-|                              **TOTAL** |  **467** |   **24** |  **116** |    **4** | **95%** |           |
+|                              **TOTAL** |  **474** |   **24** |  **120** |    **4** | **95%** |           |
 
 3 empty files skipped.
 
