@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="d_67f6f9a13eff1831_submission_processor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.3">coverage.py v7.4.3</a>,
-            created at 2024-03-13 16:00 +0000
+            created at 2024-03-14 14:44 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -195,9 +195,9 @@
     <p class="run"><span class="n"><a id="t111" href="#t111">111</a></span><span class="t">    <span class="key">return</span> <span class="nam">JSONResponse</span><span class="op">(</span><span class="nam">status_code</span><span class="op">=</span><span class="nam">status</span><span class="op">.</span><span class="nam">HTTP_204_NO_CONTENT</span><span class="op">,</span> <span class="nam">content</span><span class="op">=</span><span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t112" href="#t112">112</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t113" href="#t113">113</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/institutions/{lei}/filings/{period_name}/contact-info"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">ContactInfoDTO</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t114" href="#t114">114</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">"/institutions/{lei}/filings/{period_name}/contact-info"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">ContactInfoDTO</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t115" href="#t115">115</a></span><span class="t"><span class="op">@</span><span class="nam">requires</span><span class="op">(</span><span class="str">"authenticated"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">post_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">:</span> <span class="nam">Request</span><span class="op">,</span> <span class="nam">lei</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">contact_info</span><span class="op">:</span> <span class="nam">ContactInfoDTO</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t116" href="#t116">116</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">put_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">:</span> <span class="nam">Request</span><span class="op">,</span> <span class="nam">lei</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">:</span> <span class="nam">str</span><span class="op">,</span> <span class="nam">contact_info</span><span class="op">:</span> <span class="nam">ContactInfoDTO</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t117" href="#t117">117</a></span><span class="t">    <span class="key">return</span> <span class="key">await</span> <span class="nam">repo</span><span class="op">.</span><span class="nam">update_contact_info</span><span class="op">(</span><span class="nam">request</span><span class="op">.</span><span class="nam">state</span><span class="op">.</span><span class="nam">db_session</span><span class="op">,</span> <span class="nam">lei</span><span class="op">,</span> <span class="nam">period_name</span><span class="op">,</span> <span class="nam">contact_info</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
@@ -208,7 +208,7 @@
             <a id="nextFileLink" class="nav" href="d_67f6f9a13eff1831_submission_processor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.3">coverage.py v7.4.3</a>,
-            created at 2024-03-13 16:00 +0000
+            created at 2024-03-14 14:44 +0000
         </p>
     </div>
 </footer>
