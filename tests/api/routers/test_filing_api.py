@@ -139,13 +139,10 @@ class TestFilingApi:
         mock_upload.return_value = None
         mock_validate_submission = mocker.patch("services.submission_processor.validate_submission")
         mock_validate_submission.return_value = None
-        mock_update_submission = mocker.patch("services.submission_processor.update_submission")
-        mock_update_submission.return_value = None
         files = {"file": ("submission.csv", open(submission_csv, "rb"))}
         client = TestClient(app_fixture)
         res = client.post("/v1/filing/123456790/submissions/1", files=files)
         assert res.status_code == 202
-        assert mock_update_submission.mock_calls[0].args[0].state == "SUBMISSION_UPLOADED"
 
     def test_unauthed_upload_file(self, mocker: MockerFixture, app_fixture: FastAPI, submission_csv: str):
         files = {"file": ("submission.csv", open(submission_csv, "rb"))}

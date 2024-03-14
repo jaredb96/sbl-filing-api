@@ -33,8 +33,8 @@ def upgrade() -> None:
     with op.batch_alter_table("submission", schema=None) as batch_op:
         batch_op.alter_column(
             "state",
-            type_=sa.Enum(*old_options, name="submissionstate"),
-            existing_type=sa.Enum(*new_options, name="submissionstate"),
+            type_=sa.Enum(*new_options, name="submissionstate"),
+            existing_type=sa.Enum(*old_options, name="submissionstate"),
             existing_server_default=sa.text("'text'"),
         )
 
@@ -43,7 +43,7 @@ def downgrade() -> None:
     with op.batch_alter_table("submission", schema=None) as batch_op:
         batch_op.alter_column(
             "state",
-            type_=sa.Enum(*new_options, name="submissionstate"),
-            existing_type=sa.Enum(*old_options, name="submissionstate"),
+            type_=sa.Enum(*old_options, name="submissionstate"),
+            existing_type=sa.Enum(*new_options, name="submissionstate"),
             existing_server_default=sa.text("'text'"),
         )

@@ -26,12 +26,6 @@ async def upload_to_storage(lei: str, submission_id: str, content: bytes, extens
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to upload file")
 
 
-async def upload_to_storage_and_update_submission(lei: str, submission_id: str, content: bytes, extension: str = "csv"):
-    await upload_to_storage(lei, submission_id, content, extension)
-    # Set SUBMISSION_UPLOADED
-    await update_submission(SubmissionDAO(submitter=submission_id, state=SubmissionState.SUBMISSION_UPLOADED))
-
-
 async def validate_submission(lei: str, submission_id: str, content: bytes, background_tasks: BackgroundTasks):
     df = pd.read_csv(BytesIO(content), dtype=str, na_filter=False)
     validator_version = imeta.version("regtech-data-validator")
