@@ -365,7 +365,7 @@ class TestFilingApi:
             "email": "name_1@email.test",
         }
         client = TestClient(app_fixture)
-        res = client.post("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
+        res = client.put("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
         assert res.status_code == 403
 
     def test_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
@@ -397,7 +397,7 @@ class TestFilingApi:
             "phone": "112-345-6789",
             "email": "name_1@email.test",
         }
-        res = client.post("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
+        res = client.put("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
 
         assert res.status_code == 200
         mock.assert_called_with(
