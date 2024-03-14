@@ -72,3 +72,13 @@ class TestSubmissionProcessor:
         mock_update_submission.return_value = None
         await submission_processor.validate_and_update_submission(pd.DataFrame(), "123456790", "1", "0.1.0")
         assert mock_update_submission.mock_calls[0].args[0].state == "VALIDATION_WITH_ERRORS"
+
+    async def test_upload_to_storage_and_update_submission(
+        self, mocker: MockerFixture, mock_fs_func: Mock, mock_fs: Mock
+    ):
+        mock_upload_to_storage = mocker.patch("services.submission_processor.upload_to_storage")
+        mock_upload_to_storage.return_value = None
+        mock_update_submission = mocker.patch("services.submission_processor.update_submission")
+        mock_update_submission.return_value = None
+        await submission_processor.upload_to_storage_and_update_submission("test", "test", b"test content")
+        assert mock_update_submission.mock_calls[0].args[0].state == "SUBMISSION_UPLOADED"
