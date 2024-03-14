@@ -1,10 +1,11 @@
-"""change submission enum
+"""update submission state enum
 
-Revision ID: 7a1b7eab0167
-Revises: b3bfb504ae7e
-Create Date: 2024-03-13 14:38:34.324557
+Revision ID: b70d06f93029
+Revises: 8eaef8ce4c23
+Create Date: 2024-03-13 11:41:42.122257
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -12,30 +13,20 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "7a1b7eab0167"
-down_revision: Union[str, None] = "b3bfb504ae7e"
+revision: str = "b70d06f93029"
+down_revision: Union[str, None] = "8eaef8ce4c23"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-
 old_options = (
+    "SUBMISSION_UPLOADED",
+    "VALIDATION_IN_PROGRESS",
+    "VALIDATION_WITH_ERRORS",
+    "VALIDATION_WITH_WARNINGS",
+    "VALIDATION_SUCCESSFUL",
     "SUBMISSION_SIGNED",
-    "SUBMISSION_STARTED",
-    "SUBMISSION_UPLOADED",
-    "VALIDATION_IN_PROGRESS",
-    "VALIDATION_WITH_ERRORS",
-    "VALIDATION_WITH_WARNINGS",
-    "VALIDATION_SUCCESSFUL",
 )
-new_options = (
-    "SUBMISSION_CERTIFIED",
-    "SUBMISSION_STARTED",
-    "SUBMISSION_UPLOADED",
-    "VALIDATION_IN_PROGRESS",
-    "VALIDATION_WITH_ERRORS",
-    "VALIDATION_WITH_WARNINGS",
-    "VALIDATION_SUCCESSFUL",
-)
+new_options = sorted(old_options + ("SUBMISSION_STARTED",))
 
 
 def upgrade() -> None:
