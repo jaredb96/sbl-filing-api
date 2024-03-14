@@ -350,7 +350,7 @@ class TestFilingApi:
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/contact-info")
         assert res.status_code == 204
 
-    async def test_unauthed_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, unauthed_user_mock):
+    async def test_unauthed_put_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, unauthed_user_mock):
         contact_info_json = {
             "id": 1,
             "filing": 1,
@@ -368,7 +368,7 @@ class TestFilingApi:
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
         assert res.status_code == 403
 
-    def test_post_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+    def test_put_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
         mock.return_value = ContactInfoDAO(
             id=1,

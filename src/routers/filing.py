@@ -113,5 +113,5 @@ async def get_contact_info(request: Request, lei: str, period_name: str):
 
 @router.put("/institutions/{lei}/filings/{period_name}/contact-info", response_model=ContactInfoDTO)
 @requires("authenticated")
-async def post_contact_info(request: Request, lei: str, period_name: str, contact_info: ContactInfoDTO):
+async def put_contact_info(request: Request, lei: str, period_name: str, contact_info: ContactInfoDTO):
     return await repo.update_contact_info(request.state.db_session, lei, period_name, contact_info)
