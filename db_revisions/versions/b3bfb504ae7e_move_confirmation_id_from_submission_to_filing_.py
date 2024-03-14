@@ -1,8 +1,8 @@
-"""add confirmation id from filing table
+"""move confirmation id from submission to filing table
 
-Revision ID: 3666d04f0c55
-Revises: b3bfb504ae7e
-Create Date: 2024-03-14 03:24:02.315715
+Revision ID: b3bfb504ae7e
+Revises: 8eaef8ce4c23
+Create Date: 2024-03-14 03:18:39.063892
 
 """
 
@@ -13,15 +13,17 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "3666d04f0c55"
-down_revision: Union[str, None] = "b3bfb504ae7e"
+revision: str = "b3bfb504ae7e"
+down_revision: Union[str, None] = "8eaef8ce4c23"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    op.drop_column("submission", "confirmation_id")
     op.add_column("filing", sa.Column("confirmation_id", sa.String))
 
 
 def downgrade() -> None:
+    op.add_column("submission", sa.Column("confirmation_id", sa.String))
     op.drop_column("filing", "confirmation_id")
