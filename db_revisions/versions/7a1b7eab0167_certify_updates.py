@@ -5,6 +5,7 @@ Revises: b3bfb504ae7e
 Create Date: 2024-03-13 14:38:34.324557
 
 """
+# fmt: off
 from typing import Sequence, Union
 
 from alembic import op, context
@@ -54,3 +55,4 @@ def downgrade() -> None:
         op.execute("ALTER TABLE submission ALTER COLUMN state TYPE submissionstate USING state::text::submissionstate")
         op.execute("DROP TYPE submissionstate_old")
     op.drop_column("submission", "certifier")
+# fmt: on
