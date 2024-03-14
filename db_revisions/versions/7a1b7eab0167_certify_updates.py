@@ -44,6 +44,7 @@ def upgrade() -> None:
         op.execute(f"CREATE TYPE submissionstate AS ENUM{new_options}")
         op.execute("ALTER TABLE submission ALTER COLUMN state TYPE submissionstate USING state::text::submissionstate")
         op.execute("DROP TYPE submissionstate_old")
+    op.add_column("submission", sa.Column("certifier", sa.String))
 
 
 def downgrade() -> None:
@@ -52,3 +53,4 @@ def downgrade() -> None:
         op.execute(f"CREATE TYPE submissionstate AS ENUM{old_options}")
         op.execute("ALTER TABLE submission ALTER COLUMN state TYPE submissionstate USING state::text::submissionstate")
         op.execute("DROP TYPE submissionstate_old")
+    op.drop_column("submission", "certifier")
