@@ -8,7 +8,7 @@
 | src/entities/engine/\_\_init\_\_.py    |        2 |        0 |        0 |        0 |    100% |           |
 | src/entities/engine/engine.py          |       10 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/\_\_init\_\_.py    |        4 |        0 |        0 |        0 |    100% |           |
-| src/entities/models/dao.py             |       73 |        5 |        0 |        0 |     93% |28, 47, 62, 80, 93 |
+| src/entities/models/dao.py             |       73 |        5 |        0 |        0 |     93% |27, 46, 61, 79, 93 |
 | src/entities/models/dto.py             |       59 |        0 |        0 |        0 |    100% |           |
 | src/entities/models/model\_enums.py    |       15 |        0 |        0 |        0 |    100% |           |
 | src/entities/repos/submission\_repo.py |      110 |        4 |       22 |        2 |     95% |63->65, 70->72, 111-114 |
