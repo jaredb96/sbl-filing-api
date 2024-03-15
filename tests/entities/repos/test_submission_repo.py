@@ -375,7 +375,7 @@ class TestSubmissionRepo:
         assert res.email == "test2@cfpb.gov"
 
     async def test_create_contact_info(self, transaction_session: AsyncSession):
-        await repo.update_contact_info(
+        filing = await repo.update_contact_info(
             transaction_session,
             lei="ZYXWVUTSRQP",
             filing_period="2024",
@@ -392,24 +392,21 @@ class TestSubmissionRepo:
             ),
         )
 
-        # Testing to make sure the newly created contact_info is linked to the correct filing.
-        filing = await repo.get_filing(transaction_session, lei="ZYXWVUTSRQP", filing_period="2024")
-        filing_contact_info = filing.contact_info
-
-        assert filing_contact_info.id == 3
-        assert filing_contact_info.filing == 3
-        assert filing_contact_info.first_name == "test_first_name_3"
-        assert filing_contact_info.last_name == "test_last_name_3"
-        assert filing_contact_info.hq_address_street_1 == "address street 1"
-        assert filing_contact_info.hq_address_street_2 == ""
-        assert filing_contact_info.hq_address_city == "Test City"
-        assert filing_contact_info.hq_address_state == "TS"
-        assert filing_contact_info.hq_address_zip == "12345"
-        assert filing_contact_info.phone == "312-345-6789"
-        assert filing_contact_info.email == "test3@cfpb.gov"
+        assert filing.lei == "ZYXWVUTSRQP"
+        assert filing.contact_info.id == 3
+        assert filing.contact_info.filing == 3
+        assert filing.contact_info.first_name == "test_first_name_3"
+        assert filing.contact_info.last_name == "test_last_name_3"
+        assert filing.contact_info.hq_address_street_1 == "address street 1"
+        assert filing.contact_info.hq_address_street_2 == ""
+        assert filing.contact_info.hq_address_city == "Test City"
+        assert filing.contact_info.hq_address_state == "TS"
+        assert filing.contact_info.hq_address_zip == "12345"
+        assert filing.contact_info.phone == "312-345-6789"
+        assert filing.contact_info.email == "test3@cfpb.gov"
 
     async def test_update_contact_info(self, transaction_session: AsyncSession):
-        await repo.update_contact_info(
+        filing = await repo.update_contact_info(
             transaction_session,
             lei="ABCDEFGHIJ",
             filing_period="2024",
@@ -428,21 +425,18 @@ class TestSubmissionRepo:
             ),
         )
 
-        # Testing to make sure the filing contact_info is updated
-        filing = await repo.get_filing(transaction_session, lei="ABCDEFGHIJ", filing_period="2024")
-        filing_contact_info = filing.contact_info
-
-        assert filing_contact_info.id == 2
-        assert filing_contact_info.filing == 2
-        assert filing_contact_info.first_name == "test_first_name_upd"
-        assert filing_contact_info.last_name == "test_last_name_upd"
-        assert filing_contact_info.hq_address_street_1 == "address street upd"
-        assert filing_contact_info.hq_address_street_2 == ""
-        assert filing_contact_info.hq_address_city == "Test City upd"
-        assert filing_contact_info.hq_address_state == "TS"
-        assert filing_contact_info.hq_address_zip == "12345"
-        assert filing_contact_info.phone == "212-345-6789_upd"
-        assert filing_contact_info.email == "test2_upd@cfpb.gov"
+        assert filing.lei == "ABCDEFGHIJ"
+        assert filing.contact_info.id == 2
+        assert filing.contact_info.filing == 2
+        assert filing.contact_info.first_name == "test_first_name_upd"
+        assert filing.contact_info.last_name == "test_last_name_upd"
+        assert filing.contact_info.hq_address_street_1 == "address street upd"
+        assert filing.contact_info.hq_address_street_2 == ""
+        assert filing.contact_info.hq_address_city == "Test City upd"
+        assert filing.contact_info.hq_address_state == "TS"
+        assert filing.contact_info.hq_address_zip == "12345"
+        assert filing.contact_info.phone == "212-345-6789_upd"
+        assert filing.contact_info.email == "test2_upd@cfpb.gov"
 
     def get_error_json(self):
         df_columns = [
