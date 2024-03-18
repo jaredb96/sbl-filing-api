@@ -278,7 +278,8 @@ class TestFilingApi:
         )
         assert res.status_code == 422
         assert (
-            res.content == b'"The LEI (1234567890) and period (2024) that was attempted to be updated does not exist."'
+            res.content
+            == b'"A Filing for the LEI (1234567890) and period (2024) that was attempted to be updated does not exist."'
         )
 
     async def test_unauthed_task_update(self, app_fixture: FastAPI, unauthed_user_mock: Mock):

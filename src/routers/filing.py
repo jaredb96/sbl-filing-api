@@ -119,5 +119,5 @@ async def put_contact_info(request: Request, lei: str, period_name: str, contact
         return await repo.update_contact_info(request.state.db_session, lei, period_name, contact_info)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=f"The LEI ({lei}) and period ({period_name}) that was attempted to be updated does not exist.",
+        content=f"A Filing for the LEI ({lei}) and period ({period_name}) that was attempted to be updated does not exist.",
     )
