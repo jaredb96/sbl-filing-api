@@ -266,7 +266,11 @@ class TestFilingApi:
             "/v1/filing/institutions/1234567890/filings/2025/institution-snapshot-id",
             json={"institution_snapshot_id": "v3"},
         )
-        assert res.status_code == 204
+        assert res.status_code == 422
+        assert (
+            res.content
+            == b'"A Filing for the LEI (1234567890) and period (2025) that was attempted to be updated does not exist."'
+        )
 
         # no known field for endpoint
         get_filing_mock.return_value = filing_return

@@ -114,7 +114,10 @@ async def put_institution_snapshot(request: Request, lei: str, period_name: str,
     if result:
         result.institution_snapshot_id = update_value.institution_snapshot_id
         return await repo.upsert_filing(request.state.db_session, result)
-    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=f"A Filing for the LEI ({lei}) and period ({period_name}) that was attempted to be updated does not exist.",
+    )
 
 
 @router.post("/institutions/{lei}/filings/{period_name}/tasks/{task_name}")
