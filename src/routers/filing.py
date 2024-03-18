@@ -107,14 +107,14 @@ async def get_submission(request: Request, id: int):
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 
-@router.put("/institutions/{lei}/filings/{period_name}/submissions/{id}/certify", response_model=SubmissionDTO)
+@router.put("/institutions/{lei}/filings/{period_name}/submissions/{id}/accept", response_model=SubmissionDTO)
 @requires("authenticated")
-async def certify_submission(request: Request, id: int, lei: str, period_name: str):
+async def accept_submission(request: Request, id: int, lei: str, period_name: str):
     result = await repo.get_submission(request.state.db_session, id)
     if not result:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=f"Submission ID {id} does not exist, cannot certify a non-existing submission.",
+            content=f"Submission ID {id} does not exist, cannot accept a non-existing submission.",
         )
     if (
         result.state != SubmissionState.VALIDATION_SUCCESSFUL
@@ -122,10 +122,10 @@ async def certify_submission(request: Request, id: int, lei: str, period_name: s
     ):
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content=f"Submission {id} for LEI {lei} in filing period {period_name} is not in a certifiable state.  Submissions must be validated successfully or with only warnings to be signed",
+            content=f"Submission {id} for LEI {lei} in filing period {period_name} is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be signed",
         )
-    result.state = SubmissionState.SUBMISSION_CERTIFIED
-    result.certifier = request.user.id
+    result.state = SubmissionState.SUBMISSION_ACCEPTED
+    result.accepter = request.user.id
     return await repo.update_submission(result, request.state.db_session)
 
 

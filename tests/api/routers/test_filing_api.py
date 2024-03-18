@@ -474,7 +474,7 @@ class TestFilingApi:
             ),
         )
 
-    async def test_certify_submission(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+    async def test_accept_submission(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("entities.repos.submission_repo.get_submission")
         mock.return_value = SubmissionDAO(
             id=1,
@@ -490,27 +490,27 @@ class TestFilingApi:
             id=1,
             submitter="test1@cfpb.gov",
             filing=1,
-            state=SubmissionState.SUBMISSION_CERTIFIED,
+            state=SubmissionState.SUBMISSION_ACCEPTED,
             validation_ruleset_version="v1",
             submission_time=datetime.datetime.now(),
             filename="file1.csv",
         )
         client = TestClient(app_fixture)
-        res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/certify")
+        res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         assert res.status_code == 403
         assert (
             res.json()
-            == "Submission 1 for LEI 1234567890 in filing period 2024 is not in a certifiable state.  Submissions must be validated successfully or with only warnings to be signed"
+            == "Submission 1 for LEI 1234567890 in filing period 2024 is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be signed"
         )
 
         mock.return_value.state = SubmissionState.VALIDATION_SUCCESSFUL
-        res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/certify")
+        res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         update_mock.assert_called_once()
-        assert update_mock.call_args.args[0].state == "SUBMISSION_CERTIFIED"
-        assert update_mock.call_args.args[0].certifier == "123456-7890-ABCDEF-GHIJ"
+        assert update_mock.call_args.args[0].state == "SUBMISSION_ACCEPTED"
+        assert update_mock.call_args.args[0].accepter == "123456-7890-ABCDEF-GHIJ"
         assert res.status_code == 200
 
         mock.return_value = None
-        res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/certify")
+        res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         assert res.status_code == 422
-        assert res.json() == "Submission ID 1 does not exist, cannot certify a non-existing submission."
+        assert res.json() == "Submission ID 1 does not exist, cannot accept a non-existing submission."
