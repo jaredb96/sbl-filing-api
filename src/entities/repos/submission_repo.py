@@ -149,7 +149,7 @@ async def update_task_state(
 
 async def update_contact_info(
     session: AsyncSession, lei: str, filing_period: str, new_contact_info: ContactInfoDTO
-) -> ContactInfoDAO:
+) -> FilingDAO:
     filing = await get_filing(session, lei=lei, filing_period=filing_period)
     filing.contact_info = ContactInfoDAO(**new_contact_info.__dict__.copy(), filing=filing.id)
     return await upsert_helper(session, filing, FilingDAO)

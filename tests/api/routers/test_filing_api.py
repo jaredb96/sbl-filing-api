@@ -12,7 +12,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
-from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO, ContactInfoDTO
+from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO, ContactInfoDTO, FilingDAO
 
 from routers.dependencies import verify_lei
 
@@ -370,19 +370,26 @@ class TestFilingApi:
 
     def test_put_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
-        mock.return_value = ContactInfoDAO(
+        mock.return_value = FilingDAO(
             id=1,
-            filing=1,
-            first_name="test_first_name_1",
-            last_name="test_last_name_1",
-            hq_address_street_1="address street 1",
-            hq_address_street_2="",
-            hq_address_city="Test City 1",
-            hq_address_state="TS",
-            hq_address_zip="12345",
-            phone="112-345-6789",
-            email="name_1@email.test",
+            lei="1234567890",
+            institution_snapshot_id="Snapshot-1",
+            filing_period="2024",
+            contact_info=ContactInfoDAO(
+                id=1,
+                filing=1,
+                first_name="test_first_name_1",
+                last_name="test_last_name_1",
+                hq_address_street_1="address street 1",
+                hq_address_street_2="",
+                hq_address_city="Test City 1",
+                hq_address_state="TS",
+                hq_address_zip="12345",
+                phone="112-345-6789",
+                email="name_1@email.test",
+            ),
         )
+
         client = TestClient(app_fixture)
         contact_info_json = {
             "id": 1,
@@ -400,6 +407,23 @@ class TestFilingApi:
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
 
         assert res.status_code == 200
+
+        result = res.json()
+        assert result["id"] == 1
+        assert result["lei"] == "1234567890"
+        assert result["institution_snapshot_id"] == "Snapshot-1"
+        assert result["filing_period"] == "2024"
+        assert result["contact_info"]["id"] == 1
+        assert result["contact_info"]["first_name"] == "test_first_name_1"
+        assert result["contact_info"]["last_name"] == "test_last_name_1"
+        assert result["contact_info"]["hq_address_street_1"] == "address street 1"
+        assert result["contact_info"]["hq_address_street_2"] == ""
+        assert result["contact_info"]["hq_address_city"] == "Test City 1"
+        assert result["contact_info"]["hq_address_state"] == "TS"
+        assert result["contact_info"]["hq_address_zip"] == "12345"
+        assert result["contact_info"]["phone"] == "112-345-6789"
+        assert result["contact_info"]["email"] == "name_1@email.test"
+
         mock.assert_called_with(
             ANY,
             "1234567890",
