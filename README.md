@@ -15,9 +15,9 @@
 | src/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/routers/\_\_init\_\_.py            |        2 |        0 |        0 |        0 |    100% |           |
 | src/routers/dependencies.py            |       15 |        0 |        6 |        1 |     95% |  12->exit |
-| src/routers/filing.py                  |       88 |        0 |       78 |        0 |    100% |           |
+| src/routers/filing.py                  |       91 |        0 |       80 |        0 |    100% |           |
 | src/services/submission\_processor.py  |       42 |        0 |       10 |        0 |    100% |           |
-|                              **TOTAL** |  **491** |   **20** |  **122** |    **4** | **96%** |           |
+|                              **TOTAL** |  **494** |   **20** |  **124** |    **4** | **96%** |           |
 
 3 empty files skipped.
 
