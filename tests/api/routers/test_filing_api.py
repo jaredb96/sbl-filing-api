@@ -258,6 +258,29 @@ class TestFilingApi:
         assert res.status_code == 200
         assert res.json()["institution_snapshot_id"] == "v3"
 
+        # no existing filing for contact_info
+        get_filing_mock.return_value = None
+        res = client.put(
+            "/v1/filing/institutions/1234567890/filings/2024/contact-info",
+            json={
+                "id": 1,
+                "filing": 1,
+                "first_name": "test_first_name_1",
+                "last_name": "test_last_name_1",
+                "hq_address_street_1": "address street 1",
+                "hq_address_street_2": "",
+                "hq_address_city": "Test City 1",
+                "hq_address_state": "TS",
+                "hq_address_zip": "12345",
+                "phone": "112-345-6789",
+                "email": "name_1@email.test",
+            },
+        )
+        assert res.status_code == 422
+        assert (
+            res.content == b'"The LEI (1234567890) and period (2024) that was attempted to be updated does not exist."'
+        )
+
     async def test_unauthed_task_update(self, app_fixture: FastAPI, unauthed_user_mock: Mock):
         client = TestClient(app_fixture)
         res = client.post(
@@ -368,7 +391,11 @@ class TestFilingApi:
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
         assert res.status_code == 403
 
-    def test_put_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+    def test_put_contact_info(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, get_filing_mock: Mock
+    ):
+        get_filing_mock.return_value
+
         mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
         mock.return_value = ContactInfoDAO(
             id=1,
@@ -397,6 +424,7 @@ class TestFilingApi:
             "phone": "112-345-6789",
             "email": "name_1@email.test",
         }
+
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/contact-info", json=contact_info_json)
 
         assert res.status_code == 200
