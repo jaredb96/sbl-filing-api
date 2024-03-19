@@ -21,7 +21,7 @@ from entities.models import (
     ContactInfoDTO,
 )
 from entities.repos import submission_repo as repo
-from regtech_api_commons.models import AuthenticatedUser
+from regtech_api_commons.models.auth import AuthenticatedUser
 from pytest_mock import MockerFixture
 
 
