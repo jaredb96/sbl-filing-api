@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List, TypeVar
 from entities.engine.engine import SessionLocal
 
-from regtech_api_commons.models import AuthenticatedUser
+from regtech_api_commons.models.auth import AuthenticatedUser
 
 from copy import deepcopy
 

@@ -1,6 +1,6 @@
 from fastapi import Depends, Request, UploadFile, BackgroundTasks, status, HTTPException
 from fastapi.responses import JSONResponse
-from regtech_api_commons.api import Router
+from regtech_api_commons.api.router_wrapper import Router
 from services import submission_processor
 from typing import Annotated, List
 
