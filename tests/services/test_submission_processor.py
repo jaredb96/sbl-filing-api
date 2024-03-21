@@ -27,10 +27,10 @@ class TestSubmissionProcessor:
 
     async def test_upload(self, mocker: MockerFixture, mock_fs_func: Mock, mock_fs: Mock):
         with mocker.mock_open(mock_fs.open):
-            await submission_processor.upload_to_storage("test", "test", b"test content local")
+            await submission_processor.upload_to_storage("test_period", "test", "test", b"test content local")
         mock_fs_func.assert_called()
         mock_fs.mkdirs.assert_called()
-        mock_fs.open.assert_called_with(ANY, "wb")
+        mock_fs.open.assert_called_with("../upload/upload/test_period/test/test.csv", "wb")
         file_handle = mock_fs.open()
         file_handle.write.assert_called_with(b"test content local")
 
@@ -38,10 +38,10 @@ class TestSubmissionProcessor:
         default_fs_proto = settings.upload_fs_protocol
         settings.upload_fs_protocol = FsProtocol.S3
         with mocker.mock_open(mock_fs.open):
-            await submission_processor.upload_to_storage("test", "test", b"test content s3")
+            await submission_processor.upload_to_storage("test_period", "test", "test", b"test content s3")
         mock_fs_func.assert_called()
         mock_fs.mkdirs.assert_not_called()
-        mock_fs.open.assert_called_with(ANY, "wb")
+        mock_fs.open.assert_called_with("../upload/upload/test_period/test/test.csv", "wb")
         file_handle = mock_fs.open()
         file_handle.write.assert_called_with(b"test content s3")
         settings.upload_fs_protocol = default_fs_proto
@@ -50,7 +50,7 @@ class TestSubmissionProcessor:
         log_mock = mocker.patch("services.submission_processor.log")
         mock_fs.mkdirs.side_effect = IOError("test")
         with pytest.raises(Exception) as e:
-            await submission_processor.upload_to_storage("test", "test", b"test content")
+            await submission_processor.upload_to_storage("test_period", "test", "test", b"test content")
         log_mock.error.assert_called_with("Failed to upload file", ANY, exc_info=True, stack_info=True)
         assert isinstance(e.value, HTTPException)
 
