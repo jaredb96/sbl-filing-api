@@ -12,7 +12,7 @@ RUN poetry install --no-root
 COPY ./src ./src
 COPY ./db_revisions ./db_revisions
 
-WORKDIR /usr/app/src
+WORKDIR /usr/app/src/sbl_filing_api
 
 EXPOSE 8888
 
