@@ -1,11 +1,11 @@
 from fastapi import Depends, Request, UploadFile, BackgroundTasks, status, HTTPException
 from fastapi.responses import JSONResponse
-from regtech_api_commons.api import Router
-from services import submission_processor
+from regtech_api_commons.api.router_wrapper import Router
+from sbl_filing_api.services import submission_processor
 from typing import Annotated, List
 
-from entities.engine import get_session
-from entities.models import (
+from sbl_filing_api.entities.engine.engine import get_session
+from sbl_filing_api.entities.models.dto import (
     FilingPeriodDTO,
     SubmissionDTO,
     FilingDTO,
@@ -14,14 +14,15 @@ from entities.models import (
     ContactInfoDTO,
     SubmissionState,
 )
-from entities.repos import submission_repo as repo
+
+from sbl_filing_api.entities.repos import submission_repo as repo
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette.authentication import requires
 
-from .dependencies import verify_user_lei_relation
+from sbl_filing_api.routers.dependencies import verify_user_lei_relation
 
 
 async def set_db(request: Request, session: Annotated[AsyncSession, Depends(get_session)]):
@@ -74,7 +75,7 @@ async def upload_file(
         )
 
     submission = await repo.add_submission(request.state.db_session, filing.id, request.user.id, file.filename)
-    await submission_processor.upload_to_storage(lei, submission.id, content, file.filename.split(".")[-1])
+    await submission_processor.upload_to_storage(period_name, lei, submission.id, content, file.filename.split(".")[-1])
 
     submission.state = SubmissionState.SUBMISSION_UPLOADED
     submission = await repo.update_submission(submission)
@@ -136,7 +137,10 @@ async def put_institution_snapshot(request: Request, lei: str, period_name: str,
     if result:
         result.institution_snapshot_id = update_value.institution_snapshot_id
         return await repo.upsert_filing(request.state.db_session, result)
-    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=f"A Filing for the LEI ({lei}) and period ({period_name}) that was attempted to be updated does not exist.",
+    )
 
 
 @router.post("/institutions/{lei}/filings/{period_name}/tasks/{task_name}")
@@ -157,4 +161,10 @@ async def get_contact_info(request: Request, lei: str, period_name: str):
 @router.put("/institutions/{lei}/filings/{period_name}/contact-info", response_model=FilingDTO)
 @requires("authenticated")
 async def put_contact_info(request: Request, lei: str, period_name: str, contact_info: ContactInfoDTO):
-    return await repo.update_contact_info(request.state.db_session, lei, period_name, contact_info)
+    result = await repo.get_filing(request.state.db_session, lei, period_name)
+    if result:
+        return await repo.update_contact_info(request.state.db_session, lei, period_name, contact_info)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=f"A Filing for the LEI ({lei}) and period ({period_name}) that was attempted to be updated does not exist.",
+    )

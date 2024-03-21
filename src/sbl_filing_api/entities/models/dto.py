@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict, Any, List
 from pydantic import BaseModel, ConfigDict
-from .model_enums import FilingType, FilingTaskState, SubmissionState
+from sbl_filing_api.entities.models.model_enums import FilingType, FilingTaskState, SubmissionState
 
 
 class SubmissionDTO(BaseModel):

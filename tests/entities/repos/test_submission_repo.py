@@ -6,22 +6,24 @@ from datetime import datetime as dt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
 
-from entities.models import (
+from sbl_filing_api.entities.models.dao import (
     SubmissionDAO,
     FilingPeriodDAO,
-    FilingPeriodDTO,
     FilingDAO,
-    FilingDTO,
     FilingTaskProgressDAO,
     FilingTaskDAO,
     FilingType,
     FilingTaskState,
     SubmissionState,
     ContactInfoDAO,
+)
+from sbl_filing_api.entities.models.dto import (
+    FilingPeriodDTO,
+    FilingDTO,
     ContactInfoDTO,
 )
-from entities.repos import submission_repo as repo
-from regtech_api_commons.models import AuthenticatedUser
+from sbl_filing_api.entities.repos import submission_repo as repo
+from regtech_api_commons.models.auth import AuthenticatedUser
 from pytest_mock import MockerFixture
 
 
@@ -232,7 +234,7 @@ class TestSubmissionRepo:
 
     async def test_get_filing(self, query_session: AsyncSession, mocker: MockerFixture):
         spy_populate_missing_tasks = mocker.patch(
-            "entities.repos.submission_repo.populate_missing_tasks", wraps=repo.populate_missing_tasks
+            "sbl_filing_api.entities.repos.submission_repo.populate_missing_tasks", wraps=repo.populate_missing_tasks
         )
         res1 = await repo.get_filing(query_session, lei="1234567890", filing_period="2024")
         assert res1.id == 1

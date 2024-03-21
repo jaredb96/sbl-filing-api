@@ -1,4 +1,4 @@
-from .model_enums import FilingType, FilingTaskState, SubmissionState
+from sbl_filing_api.entities.models.model_enums import FilingType, FilingTaskState, SubmissionState
 from datetime import datetime
 from typing import Any, List
 from sqlalchemy import Enum as SAEnum, String
