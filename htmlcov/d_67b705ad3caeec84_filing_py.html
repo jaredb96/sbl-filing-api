@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="d_67f6f9a13eff1831_submission_processor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-03-19 17:33 +0000
+            created at 2024-03-21 15:47 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -158,7 +158,7 @@
     <p class="pln"><span class="n"><a id="t74" href="#t74">74</a></span><span class="t">        <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t75" href="#t75">75</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t76" href="#t76">76</a></span><span class="t">    <span class="nam">submission</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">repo</span><span class="op">.</span><span class="nam">add_submission</span><span class="op">(</span><span class="nam">request</span><span class="op">.</span><span class="nam">state</span><span class="op">.</span><span class="nam">db_session</span><span class="op">,</span> <span class="nam">filing</span><span class="op">.</span><span class="nam">id</span><span class="op">,</span> <span class="nam">request</span><span class="op">.</span><span class="nam">user</span><span class="op">.</span><span class="nam">id</span><span class="op">,</span> <span class="nam">file</span><span class="op">.</span><span class="nam">filename</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">    <span class="key">await</span> <span class="nam">submission_processor</span><span class="op">.</span><span class="nam">upload_to_storage</span><span class="op">(</span><span class="nam">lei</span><span class="op">,</span> <span class="nam">submission</span><span class="op">.</span><span class="nam">id</span><span class="op">,</span> <span class="nam">content</span><span class="op">,</span> <span class="nam">file</span><span class="op">.</span><span class="nam">filename</span><span class="op">.</span><span class="nam">split</span><span class="op">(</span><span class="str">"."</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t77" href="#t77">77</a></span><span class="t">    <span class="key">await</span> <span class="nam">submission_processor</span><span class="op">.</span><span class="nam">upload_to_storage</span><span class="op">(</span><span class="nam">period_name</span><span class="op">,</span> <span class="nam">lei</span><span class="op">,</span> <span class="nam">submission</span><span class="op">.</span><span class="nam">id</span><span class="op">,</span> <span class="nam">content</span><span class="op">,</span> <span class="nam">file</span><span class="op">.</span><span class="nam">filename</span><span class="op">.</span><span class="nam">split</span><span class="op">(</span><span class="str">"."</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="num">1</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t78" href="#t78">78</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t79" href="#t79">79</a></span><span class="t">    <span class="nam">submission</span><span class="op">.</span><span class="nam">state</span> <span class="op">=</span> <span class="nam">SubmissionState</span><span class="op">.</span><span class="nam">SUBMISSION_UPLOADED</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t80" href="#t80">80</a></span><span class="t">    <span class="nam">submission</span> <span class="op">=</span> <span class="key">await</span> <span class="nam">repo</span><span class="op">.</span><span class="nam">update_submission</span><span class="op">(</span><span class="nam">submission</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -238,7 +238,7 @@
             <a id="nextFileLink" class="nav" href="d_67f6f9a13eff1831_submission_processor_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.4.4">coverage.py v7.4.4</a>,
-            created at 2024-03-19 17:33 +0000
+            created at 2024-03-21 15:47 +0000
         </p>
     </div>
 </footer>
