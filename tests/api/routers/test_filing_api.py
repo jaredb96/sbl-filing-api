@@ -519,7 +519,7 @@ class TestFilingApi:
         )
 
     async def test_accept_submission(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
-        mock = mocker.patch("entities.repos.submission_repo.get_submission")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submission")
         mock.return_value = SubmissionDAO(
             id=1,
             submitter="test1@cfpb.gov",
@@ -529,7 +529,7 @@ class TestFilingApi:
             submission_time=datetime.datetime.now(),
             filename="file1.csv",
         )
-        update_mock = mocker.patch("entities.repos.submission_repo.update_submission")
+        update_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.update_submission")
         update_mock.return_value = SubmissionDAO(
             id=1,
             submitter="test1@cfpb.gov",
