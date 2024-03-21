@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 
 WORKDIR /usr/app
 
@@ -12,7 +12,7 @@ RUN poetry install --no-root
 COPY ./src ./src
 COPY ./db_revisions ./db_revisions
 
-WORKDIR /usr/app/src/sbl_filing_api
+WORKDIR /usr/app/src
 
 EXPOSE 8888
 
