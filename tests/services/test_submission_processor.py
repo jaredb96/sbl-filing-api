@@ -30,7 +30,7 @@ class TestSubmissionProcessor:
             await submission_processor.upload_to_storage("test_period", "test", "test", b"test content local")
         mock_fs_func.assert_called()
         mock_fs.mkdirs.assert_called()
-        mock_fs.open.assert_called_with(ANY, "wb")
+        mock_fs.open.assert_called_with("../upload/upload/test_period/test/test.csv", "wb")
         file_handle = mock_fs.open()
         file_handle.write.assert_called_with(b"test content local")
 
@@ -41,7 +41,7 @@ class TestSubmissionProcessor:
             await submission_processor.upload_to_storage("test_period", "test", "test", b"test content s3")
         mock_fs_func.assert_called()
         mock_fs.mkdirs.assert_not_called()
-        mock_fs.open.assert_called_with(ANY, "wb")
+        mock_fs.open.assert_called_with("../upload/upload/test_period/test/test.csv", "wb")
         file_handle = mock_fs.open()
         file_handle.write.assert_called_with(b"test content s3")
         settings.upload_fs_protocol = default_fs_proto
