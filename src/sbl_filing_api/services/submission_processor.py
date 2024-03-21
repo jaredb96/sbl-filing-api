@@ -5,13 +5,13 @@ from fastapi import UploadFile
 from regtech_data_validator.create_schemas import validate_phases
 import pandas as pd
 import importlib.metadata as imeta
-from entities.models import SubmissionDAO, SubmissionState
-from entities.repos.submission_repo import update_submission
+from sbl_filing_api.entities.models.dao import SubmissionDAO, SubmissionState
+from sbl_filing_api.entities.repos.submission_repo import update_submission
 from http import HTTPStatus
 from fastapi import HTTPException
 import logging
 from fsspec import AbstractFileSystem, filesystem
-from config import settings, FsProtocol
+from sbl_filing_api.config import settings, FsProtocol
 
 log = logging.getLogger(__name__)
 

@@ -1,22 +1,22 @@
 from http import HTTPStatus
-from services import submission_processor
+from sbl_filing_api.services import submission_processor
 from fastapi import HTTPException
 import pytest
 from unittest.mock import Mock, ANY
 from pytest_mock import MockerFixture
-from config import FsProtocol, settings
-from entities.models import SubmissionDAO, SubmissionState
+from sbl_filing_api.config import FsProtocol, settings
+from sbl_filing_api.entities.models.dao import SubmissionDAO, SubmissionState
 
 
 class TestSubmissionProcessor:
     @pytest.fixture
     def mock_fs(self, mocker: MockerFixture) -> Mock:
-        fs_mock_patch = mocker.patch("services.submission_processor.AbstractFileSystem")
+        fs_mock_patch = mocker.patch("sbl_filing_api.services.submission_processor.AbstractFileSystem")
         return fs_mock_patch.return_value
 
     @pytest.fixture
     def mock_fs_func(self, mocker: MockerFixture, mock_fs: Mock) -> Mock:
-        fs_func_mock = mocker.patch("services.submission_processor.filesystem")
+        fs_func_mock = mocker.patch("sbl_filing_api.services.submission_processor.filesystem")
         fs_func_mock.return_value = mock_fs
         return fs_func_mock
 
@@ -47,7 +47,7 @@ class TestSubmissionProcessor:
         settings.upload_fs_protocol = default_fs_proto
 
     async def test_upload_failure(self, mocker: MockerFixture, mock_fs_func: Mock, mock_fs: Mock):
-        log_mock = mocker.patch("services.submission_processor.log")
+        log_mock = mocker.patch("sbl_filing_api.services.submission_processor.log")
         mock_fs.mkdirs.side_effect = IOError("test")
         with pytest.raises(Exception) as e:
             await submission_processor.upload_to_storage("test", "test", b"test content")

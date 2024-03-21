@@ -11,12 +11,12 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from regtech_api_commons.oauth2.oauth2_backend import BearerTokenAuthBackend
 from regtech_api_commons.oauth2.oauth2_admin import OAuth2Admin
 
-from routers import filing_router
+from sbl_filing_api.routers.filing import router as filing_router
 
 from alembic.config import Config
 from alembic import command
 
-from config import kc_settings
+from sbl_filing_api.config import kc_settings
 
 log = logging.getLogger()
 

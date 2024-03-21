@@ -12,9 +12,16 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
-from entities.models import SubmissionDAO, SubmissionState, FilingTaskState, ContactInfoDAO, ContactInfoDTO, FilingDAO
+from sbl_filing_api.entities.models.dao import (
+    SubmissionDAO,
+    SubmissionState,
+    FilingTaskState,
+    ContactInfoDAO,
+    FilingDAO,
+)
+from sbl_filing_api.entities.models.dto import ContactInfoDTO
 
-from routers.dependencies import verify_lei
+from sbl_filing_api.routers.dependencies import verify_lei
 
 from sqlalchemy.exc import IntegrityError
 
@@ -80,7 +87,7 @@ class TestFilingApi:
         assert res.status_code == 403
 
     async def test_get_submissions(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
-        mock = mocker.patch("entities.repos.submission_repo.get_submissions")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submissions")
         mock.return_value = [
             SubmissionDAO(
                 submitter="test1@cfpb.gov",
@@ -118,7 +125,7 @@ class TestFilingApi:
         assert res.status_code == 403
 
     async def test_get_latest_submission(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
-        mock = mocker.patch("entities.repos.submission_repo.get_latest_submission")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_latest_submission")
         mock.return_value = SubmissionDAO(
             submitter="test1@cfpb.gov",
             filing=1,
@@ -148,7 +155,7 @@ class TestFilingApi:
         assert res.status_code == 403
 
     async def test_get_submission_by_id(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
-        mock = mocker.patch("entities.repos.submission_repo.get_submission")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submission")
         mock.return_value = SubmissionDAO(
             id=1,
             submitter="test1@cfpb.gov",
@@ -185,16 +192,20 @@ class TestFilingApi:
             filename="submission.csv",
         )
 
-        mock_validate_file = mocker.patch("services.submission_processor.validate_file_processable")
+        mock_validate_file = mocker.patch("sbl_filing_api.services.submission_processor.validate_file_processable")
         mock_validate_file.return_value = None
-        mock_upload = mocker.patch("services.submission_processor.upload_to_storage")
+        mock_upload = mocker.patch("sbl_filing_api.services.submission_processor.upload_to_storage")
         mock_upload.return_value = None
-        mock_validate_submission = mocker.patch("services.submission_processor.validate_and_update_submission")
+        mock_validate_submission = mocker.patch(
+            "sbl_filing_api.services.submission_processor.validate_and_update_submission"
+        )
         mock_validate_submission.return_value = None
         async_mock = AsyncMock(return_value=return_sub)
-        mock_add_submission = mocker.patch("entities.repos.submission_repo.add_submission", side_effect=async_mock)
+        mock_add_submission = mocker.patch(
+            "sbl_filing_api.entities.repos.submission_repo.add_submission", side_effect=async_mock
+        )
         mock_update_submission = mocker.patch(
-            "entities.repos.submission_repo.update_submission", side_effect=async_mock
+            "sbl_filing_api.entities.repos.submission_repo.update_submission", side_effect=async_mock
         )
 
         files = {"file": ("submission.csv", open(submission_csv, "rb"))}
@@ -222,7 +233,7 @@ class TestFilingApi:
     def test_upload_file_invalid_type(
         self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, submission_csv: str
     ):
-        mock = mocker.patch("services.submission_processor.validate_file_processable")
+        mock = mocker.patch("sbl_filing_api.services.submission_processor.validate_file_processable")
         mock.side_effect = HTTPException(HTTPStatus.UNSUPPORTED_MEDIA_TYPE)
         client = TestClient(app_fixture)
         files = {"file": ("submission.csv", open(submission_csv, "rb"))}
@@ -232,7 +243,7 @@ class TestFilingApi:
     def test_upload_file_invalid_size(
         self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, submission_csv: str
     ):
-        mock = mocker.patch("services.submission_processor.validate_file_processable")
+        mock = mocker.patch("sbl_filing_api.services.submission_processor.validate_file_processable")
         mock.side_effect = HTTPException(HTTPStatus.REQUEST_ENTITY_TOO_LARGE)
         client = TestClient(app_fixture)
         files = {"file": ("submission.csv", open(submission_csv, "rb"))}
@@ -253,7 +264,7 @@ class TestFilingApi:
     ):
         filing_return = get_filing_mock.return_value
 
-        mock = mocker.patch("entities.repos.submission_repo.upsert_filing")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.upsert_filing")
         updated_filing_obj = deepcopy(get_filing_mock.return_value)
         updated_filing_obj.institution_snapshot_id = "v3"
         mock.return_value = updated_filing_obj
@@ -327,7 +338,7 @@ class TestFilingApi:
         assert res.status_code == 403
 
     async def test_task_update(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
-        mock = mocker.patch("entities.repos.submission_repo.update_task_state")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.update_task_state")
         client = TestClient(app_fixture)
         res = client.post(
             "/v1/filing/institutions/1234567890/filings/2024/tasks/Task-1",
@@ -359,7 +370,7 @@ class TestFilingApi:
         assert res.status_code == 200
 
     def test_verify_lei_dependency(self, mocker: MockerFixture):
-        mock_user_fi_service = mocker.patch("routers.dependencies.httpx.get")
+        mock_user_fi_service = mocker.patch("sbl_filing_api.routers.dependencies.httpx.get")
         mock_user_fi_service.return_value = httpx.Response(200, json={"is_active": False})
         with pytest.raises(HTTPException) as http_exc:
             request = Request(scope={"type": "http", "headers": [(b"authorization", b"123")]})
@@ -374,7 +385,7 @@ class TestFilingApi:
         assert res.status_code == 403
 
     async def test_get_contact_info(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
-        mock = mocker.patch("entities.repos.submission_repo.get_contact_info")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_contact_info")
         mock.return_value = ContactInfoDAO(
             id=1,
             filing=1,
@@ -433,7 +444,7 @@ class TestFilingApi:
     ):
         get_filing_mock.return_value
 
-        mock = mocker.patch("entities.repos.submission_repo.update_contact_info")
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.update_contact_info")
         mock.return_value = FilingDAO(
             id=1,
             lei="1234567890",

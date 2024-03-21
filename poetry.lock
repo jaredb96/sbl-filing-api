@@ -218,17 +218,6 @@ files = [
 ]
 
 [[package]]
-name = "async-timeout"
-version = "4.0.3"
-description = "Timeout context manager for asyncio programs"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "async-timeout-4.0.3.tar.gz", hash = "sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f"},
-    {file = "async_timeout-4.0.3-py3-none-any.whl", hash = "sha256:7405140ff1230c310e51dc27b3145b9092d659ce68ff733fb0cefe3ee42be028"},
-]
-
-[[package]]
 name = "asyncpg"
 version = "0.29.0"
 description = "An asyncio PostgreSQL driver"
@@ -277,9 +266,6 @@ files = [
     {file = "asyncpg-0.29.0-cp39-cp39-win_amd64.whl", hash = "sha256:cce08a178858b426ae1aa8409b5cc171def45d4293626e7aa6510696d46decd8"},
     {file = "asyncpg-0.29.0.tar.gz", hash = "sha256:d1c49e1f44fffafd9a55e1a9b101590859d881d639ea2922516f5d9c512d354e"},
 ]
-
-[package.dependencies]
-async-timeout = {version = ">=4.0.3", markers = "python_version < \"3.12.0\""}
 
 [package.extras]
 docs = ["Sphinx (>=5.3.0,<5.4.0)", "sphinx-rtd-theme (>=1.2.2)", "sphinxcontrib-asyncio (>=0.3.0,<0.4.0)"]
@@ -1411,10 +1397,7 @@ files = [
 ]
 
 [package.dependencies]
-numpy = [
-    {version = ">=1.23.2,<2", markers = "python_version == \"3.11\""},
-    {version = ">=1.26.0,<2", markers = "python_version >= \"3.12\""},
-]
+numpy = {version = ">=1.26.0,<2", markers = "python_version >= \"3.12\""}
 python-dateutil = ">=2.8.2"
 pytz = ">=2020.1"
 tzdata = ">=2022.7"
@@ -2013,7 +1996,7 @@ name = "regtech-api-commons"
 version = "0.1.0"
 description = ""
 optional = false
-python-versions = "^3.11"
+python-versions = "^3.12"
 files = []
 develop = false
 
@@ -2028,14 +2011,14 @@ requests = "^2.31.0"
 type = "git"
 url = "https://github.com/cfpb/regtech-api-commons.git"
 reference = "HEAD"
-resolved_reference = "29356c630d2609cb81087ce35dd6c79512954d49"
+resolved_reference = "bd0e8a0a0beffc87a3ea40088dddd68cd8431d6c"
 
 [[package]]
 name = "regtech-data-validator"
 version = "0.1.0"
 description = "RegTech submission data parser and validator"
 optional = false
-python-versions = "^3.11"
+python-versions = ">=3.12,<4"
 files = []
 develop = false
 
@@ -2047,7 +2030,7 @@ pandera = "^0.18.3"
 type = "git"
 url = "https://github.com/cfpb/regtech-data-validator.git"
 reference = "HEAD"
-resolved_reference = "e0c284bc74b182682164f3f845b1ce99bbfae396"
+resolved_reference = "1aa59657cce7ec89789fe4f7c40aca45843fa4b7"
 
 [[package]]
 name = "requests"
@@ -2316,9 +2299,6 @@ files = [
     {file = "typeguard-4.1.5-py3-none-any.whl", hash = "sha256:8923e55f8873caec136c892c3bed1f676eae7be57cdb94819281b3d3bc9c0953"},
     {file = "typeguard-4.1.5.tar.gz", hash = "sha256:ea0a113bbc111bcffc90789ebb215625c963411f7096a7e9062d4e4630c155fd"},
 ]
-
-[package.dependencies]
-typing-extensions = {version = ">=4.7.0", markers = "python_version < \"3.12\""}
 
 [package.extras]
 doc = ["Sphinx (>=7)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)"]
@@ -2608,5 +2588,5 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.11"
-content-hash = "26d7428d929c0c12cf16d42f223f060731ed5d286cf9f7fec2460fec70f18154"
+python-versions = "^3.12"
+content-hash = "f8e19b27f0a5a63d787244820edfa3bad551498a8cf048018486bb0879e78dee"

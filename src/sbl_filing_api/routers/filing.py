@@ -1,11 +1,11 @@
 from fastapi import Depends, Request, UploadFile, BackgroundTasks, status, HTTPException
 from fastapi.responses import JSONResponse
 from regtech_api_commons.api.router_wrapper import Router
-from services import submission_processor
+from sbl_filing_api.services import submission_processor
 from typing import Annotated, List
 
-from entities.engine import get_session
-from entities.models import (
+from sbl_filing_api.entities.engine.engine import get_session
+from sbl_filing_api.entities.models.dto import (
     FilingPeriodDTO,
     SubmissionDTO,
     FilingDTO,
@@ -14,14 +14,15 @@ from entities.models import (
     ContactInfoDTO,
     SubmissionState,
 )
-from entities.repos import submission_repo as repo
+
+from sbl_filing_api.entities.repos import submission_repo as repo
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from starlette.authentication import requires
 
-from .dependencies import verify_user_lei_relation
+from sbl_filing_api.routers.dependencies import verify_user_lei_relation
 
 
 async def set_db(request: Request, session: Annotated[AsyncSession, Depends(get_session)]):
