@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List, TypeVar
-from entities.engine.engine import SessionLocal
+from sbl_filing_api.entities.engine.engine import SessionLocal
 
 from regtech_api_commons.models.auth import AuthenticatedUser
 
@@ -11,17 +11,19 @@ from copy import deepcopy
 
 from async_lru import alru_cache
 
-from entities.models import (
+from sbl_filing_api.entities.models.dao import (
     SubmissionDAO,
     SubmissionState,
     FilingPeriodDAO,
-    FilingPeriodDTO,
-    FilingDTO,
     FilingDAO,
     FilingTaskDAO,
     FilingTaskProgressDAO,
     FilingTaskState,
     ContactInfoDAO,
+)
+from sbl_filing_api.entities.models.dto import (
+    FilingPeriodDTO,
+    FilingDTO,
     ContactInfoDTO,
 )
 
