@@ -75,7 +75,7 @@ async def upload_file(
         )
 
     submission = await repo.add_submission(request.state.db_session, filing.id, request.user.id, file.filename)
-    await submission_processor.upload_to_storage(lei, submission.id, content, file.filename.split(".")[-1])
+    await submission_processor.upload_to_storage(period_name, lei, submission.id, content, file.filename.split(".")[-1])
 
     submission.state = SubmissionState.SUBMISSION_UPLOADED
     submission = await repo.update_submission(submission)
