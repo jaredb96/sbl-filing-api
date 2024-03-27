@@ -143,7 +143,7 @@ async def put_institution_snapshot(request: Request, lei: str, period_code: str,
     )
 
 
-@router.post("/institutions/{lei}/filings/{period_code}/tasks/{task_name}")
+@router.post("/institutions/{lei}/filings/{period_code}/tasks/{task_name}", deprecated=True)
 @requires("authenticated")
 async def update_task_state(request: Request, lei: str, period_code: str, task_name: str, state: StateUpdateDTO):
     await repo.update_task_state(request.state.db_session, lei, period_code, task_name, state.state, request.user)
