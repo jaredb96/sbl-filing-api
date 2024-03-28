@@ -540,7 +540,7 @@ class TestFilingApi:
             validation_ruleset_version="v1",
             submission_time=datetime.datetime.now(),
             filename="file1.csv",
-            acceptor_name="test",
+            accepter_name="test",
         )
         client = TestClient(app_fixture)
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
@@ -554,7 +554,7 @@ class TestFilingApi:
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         assert update_mock.call_args.args[0].state == "SUBMISSION_ACCEPTED"
         assert update_mock.call_args.args[0].accepter == "123456-7890-ABCDEF-GHIJ"
-        assert update_mock.call_args.args[0].acceptor_name == "test"
+        assert update_mock.call_args.args[0].accepter_name == "test"
         assert res.status_code == 200
 
         mock.return_value = None

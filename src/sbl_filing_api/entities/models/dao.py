@@ -23,7 +23,7 @@ class SubmissionDAO(Base):
     submission_time: Mapped[datetime] = mapped_column(server_default=func.now())
     filename: Mapped[str]
     accepter: Mapped[str] = mapped_column(nullable=True)
-    acceptor_name: Mapped[str] = mapped_column(nullable=True)
+    accepter_name: Mapped[str] = mapped_column(nullable=True)
     submitter_name: Mapped[str] = mapped_column(nullable=True)
 
     def __str__(self):

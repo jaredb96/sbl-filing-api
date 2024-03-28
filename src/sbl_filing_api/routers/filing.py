@@ -129,7 +129,7 @@ async def accept_submission(request: Request, id: int, lei: str, period_code: st
         )
     result.state = SubmissionState.SUBMISSION_ACCEPTED
     result.accepter = request.user.id
-    result.acceptor_name = request.user.name
+    result.accepter_name = request.user.name
     return await repo.update_submission(result, request.state.db_session)
 
 

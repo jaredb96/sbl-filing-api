@@ -204,4 +204,4 @@ def test_migration_to_d0ab7f051052(alembic_runner: MigrationContext, alembic_eng
 
     assert "submitter_name" in [c["name"] for c in inspector.get_columns("submission")]
 
-    assert "acceptor_name" in [c["name"] for c in inspector.get_columns("submission")]
+    assert "accepter_name" in [c["name"] for c in inspector.get_columns("submission")]

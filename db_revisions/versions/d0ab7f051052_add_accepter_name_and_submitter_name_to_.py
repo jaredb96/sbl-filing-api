@@ -1,4 +1,4 @@
-"""add acceptor_name and submitter_name to submission table
+"""add accepter_name and submitter_name to submission table
 
 Revision ID: d0ab7f051052
 Revises: 7a1b7eab0167
@@ -21,10 +21,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     with op.batch_alter_table("submission") as batch_op:
-        batch_op.add_column(sa.Column("acceptor_name", sa.String, nullable=False))
+        batch_op.add_column(sa.Column("accepter_name", sa.String, nullable=False))
         batch_op.add_column(sa.Column("submitter_name", sa.String, nullable=False))
 
 
 def downgrade() -> None:
-    op.drop_column("submission", "acceptor_name")
+    op.drop_column("submission", "accepter_name")
     op.drop_column("submission", "submitter_name")
