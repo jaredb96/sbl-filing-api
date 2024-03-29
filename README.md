@@ -12,9 +12,9 @@
 | src/sbl\_filing\_api/entities/repos/submission\_repo.py |      109 |        4 |       18 |        2 |     95% |64->66, 71->73, 110-113 |
 | src/sbl\_filing\_api/main.py                            |       33 |       11 |        2 |        0 |     69% |26-31, 35-39 |
 | src/sbl\_filing\_api/routers/dependencies.py            |       15 |        0 |        6 |        1 |     95% |  12->exit |
-| src/sbl\_filing\_api/routers/filing.py                  |      102 |        0 |       90 |        0 |    100% |           |
+| src/sbl\_filing\_api/routers/filing.py                  |      105 |        0 |       92 |        0 |    100% |           |
 | src/sbl\_filing\_api/services/submission\_processor.py  |       42 |        0 |       10 |        0 |    100% |           |
-|                                               **TOTAL** |  **500** |   **20** |  **134** |    **4** | **96%** |           |
+|                                               **TOTAL** |  **503** |   **20** |  **136** |    **4** | **96%** |           |
 
 6 empty files skipped.
 
