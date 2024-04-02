@@ -49,5 +49,5 @@ def warning_submission_mock(mocker: MockerFixture, validate_submission_mock: Moc
 @pytest.fixture(scope="function")
 def df_to_json_mock(mocker: MockerFixture, validate_submission_mock: Mock):
     mock_json_formatting = mocker.patch("sbl_filing_api.services.submission_processor.df_to_json")
-    mock_json_formatting.return_value = "{}"
+    mock_json_formatting.return_value = "[{}]"
     return mock_json_formatting
