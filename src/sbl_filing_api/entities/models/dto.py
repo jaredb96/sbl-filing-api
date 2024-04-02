@@ -16,7 +16,7 @@ class SubmissionDTO(BaseModel):
     validation_json: Dict[str, Any] | None = None
     submission_time: datetime | None = None
     filename: str
-    
+
 
 class SubmissionAccepterDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
