@@ -203,5 +203,31 @@ def test_migration_to_d0ab7f051052(alembic_runner: MigrationContext, alembic_eng
     inspector = sqlalchemy.inspect(alembic_engine)
 
     assert "submitter_name" in [c["name"] for c in inspector.get_columns("submission")]
+    assert "submitter_email" in [c["name"] for c in inspector.get_columns("submission")]
+    assert "accepter" not in [c["name"] for c in inspector.get_columns("submission")]
 
-    assert "accepter_name" in [c["name"] for c in inspector.get_columns("submission")]
+
+def test_migration_to_4a5e42bb5efa(alembic_runner: MigrationContext, alembic_engine: Engine):
+    alembic_runner.migrate_up_to("4a5e42bb5efa")
+
+    inspector = sqlalchemy.inspect(alembic_engine)
+
+    tables = inspector.get_table_names()
+
+    assert "submission_accepter" in tables
+
+    assert {
+        "id",
+        "submission",
+        "accepter",
+        "accepter_name",
+        "accepter_email",
+    } == set([c["name"] for c in inspector.get_columns("submission_accepter")])
+
+    submission_accepter_fk = inspector.get_foreign_keys("submission_accepter")[0]
+    assert submission_accepter_fk["name"] == "submission_accepter_submission_fkey"
+    assert (
+        "submission" in submission_accepter_fk["constrained_columns"]
+        and "submission" == submission_accepter_fk["referred_table"]
+        and "id" in submission_accepter_fk["referred_columns"]
+    )

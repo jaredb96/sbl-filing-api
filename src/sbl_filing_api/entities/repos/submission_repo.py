@@ -20,6 +20,7 @@ from sbl_filing_api.entities.models.dao import (
     FilingTaskProgressDAO,
     FilingTaskState,
     ContactInfoDAO,
+    SubmissionAccepterDAO,
 )
 from sbl_filing_api.entities.models.dto import (
     FilingPeriodDTO,
@@ -59,6 +60,11 @@ async def get_submission(session: AsyncSession, submission_id: int) -> Submissio
     return result[0] if result else None
 
 
+async def get_submission_accepter(session: AsyncSession, submission_id: int) -> SubmissionAccepterDAO:
+    result = await query_helper(session, SubmissionAccepterDAO, submission=submission_id)
+    return result[0] if result else None
+
+
 async def get_filing(session: AsyncSession, lei: str, filing_period: str) -> FilingDAO:
     result = await query_helper(session, FilingDAO, lei=lei, filing_period=filing_period)
     if result:
@@ -89,12 +95,13 @@ async def get_contact_info(session: AsyncSession, lei: str, filing_period: str) 
 
 
 async def add_submission(
-    session: AsyncSession, filing_id: int, submitter: str, submitter_name, filename: str
+    session: AsyncSession, filing_id: int, submitter: str, submitter_name, submitter_email, filename: str
 ) -> SubmissionDAO:
     new_sub = SubmissionDAO(
         filing=filing_id,
         submitter=submitter,
         submitter_name=submitter_name,
+        submitter_email=submitter_email,
         state=SubmissionState.SUBMISSION_STARTED,
         filename=filename,
     )
@@ -114,6 +121,28 @@ async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSe
         await session.rollback()
         logger.error(f"There was an exception storing the updated SubmissionDAO, rolling back transaction: {e}")
         raise
+
+
+async def update_submission_accepter(
+    session: AsyncSession,
+    submission_id: int,
+    accepter: str,
+    accepter_name,
+    accepter_email,
+) -> SubmissionAccepterDAO:
+    sub_accepter = await get_submission_accepter(session, submission_id=submission_id)
+    if sub_accepter:
+        sub_accepter.accepter = accepter
+        sub_accepter.accepter_name = accepter_name
+        sub_accepter.accepter_email = accepter_email
+    else:
+        sub_accepter = SubmissionAccepterDAO(
+            submission=submission_id,
+            accepter=accepter,
+            accepter_name=accepter_name,
+            accepter_email=accepter_email,
+        )
+    return await upsert_helper(session, sub_accepter, SubmissionAccepterDAO)
 
 
 async def upsert_filing_period(session: AsyncSession, filing_period: FilingPeriodDTO) -> FilingPeriodDAO:

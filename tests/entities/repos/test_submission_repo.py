@@ -16,6 +16,7 @@ from sbl_filing_api.entities.models.dao import (
     FilingTaskState,
     SubmissionState,
     ContactInfoDAO,
+    SubmissionAccepterDAO,
 )
 from sbl_filing_api.entities.models.dto import (
     FilingPeriodDTO,
@@ -88,6 +89,7 @@ class TestSubmissionRepo:
             validation_ruleset_version="v1",
             submission_time=dt.now(),
             filename="file1.csv",
+            submitter_email="test@local.host",
         )
         submission2 = SubmissionDAO(
             id=2,
@@ -97,6 +99,7 @@ class TestSubmissionRepo:
             validation_ruleset_version="v1",
             submission_time=(dt.now() - datetime.timedelta(seconds=1000)),
             filename="file2.csv",
+            submitter_email="test@local.host",
         )
         submission3 = SubmissionDAO(
             id=3,
@@ -106,7 +109,9 @@ class TestSubmissionRepo:
             validation_ruleset_version="v1",
             submission_time=dt.now(),
             filename="file3.csv",
+            submitter_email="test@local.host",
         )
+
         transaction_session.add(submission1)
         transaction_session.add(submission2)
         transaction_session.add(submission3)
@@ -139,7 +144,15 @@ class TestSubmissionRepo:
         )
         transaction_session.add(contact_info1)
         transaction_session.add(contact_info2)
-        # transaction_session.add(contact_info3)
+
+        submission_accepter1 = SubmissionAccepterDAO(
+            id=1,
+            submission=3,
+            accepter="test@local.host",
+            accepter_name="test accepter name",
+            accepter_email="test@local.host",
+        )
+        transaction_session.add(submission_accepter1)
 
         await transaction_session.commit()
 
@@ -321,6 +334,7 @@ class TestSubmissionRepo:
             submitter="123456-7890-ABCDEF-GHIJ",
             submitter_name="Submitter Name",
             filename="file1.csv",
+            submitter_email="test@local.host",
         )
         assert res.id == 4
         assert res.submitter == "123456-7890-ABCDEF-GHIJ"
@@ -335,6 +349,7 @@ class TestSubmissionRepo:
                 filing_id=1,
                 submitter="123456-7890-ABCDEF-GHIJ",
                 submitter_name="Submitter Name",
+                submitter_email="test@local.host",
                 filename="file1.csv",
             )
 
@@ -369,8 +384,31 @@ class TestSubmissionRepo:
 
         await query_updated_dao()
 
+    async def test_get_submission_accepter(self, query_session: AsyncSession):
+        res = await repo.get_submission_accepter(session=query_session, submission_id=3)
+
+        assert res.accepter == "test@local.host"
+        assert res.accepter_name == "test accepter name"
+        assert res.accepter_email == "test@local.host"
+
+    async def test_create_submission_accepter(self, transaction_session: AsyncSession):
+        submission_accepter = await repo.update_submission_accepter(
+            session=transaction_session,
+            submission_id=2,
+            accepter="test2@cfpb.gov",
+            accepter_name="test2 accepter name",
+            accepter_email="test2@cfpb.gov",
+        )
+
+        assert submission_accepter.id == 2
+        assert submission_accepter.submission == 2
+        assert submission_accepter.accepter == "test2@cfpb.gov"
+        assert submission_accepter.accepter_name == "test2 accepter name"
+        assert submission_accepter.accepter_email == "test2@cfpb.gov"
+
     async def test_get_contact_info(self, query_session: AsyncSession):
         res = await repo.get_contact_info(session=query_session, lei="ABCDEFGHIJ", filing_period="2024")
+
         assert res.id == 2
         assert res.filing == 2
         assert res.first_name == "test_first_name_2"

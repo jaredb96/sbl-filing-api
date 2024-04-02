@@ -9,14 +9,22 @@ class SubmissionDTO(BaseModel):
 
     id: int | None = None
     submitter: str
+    submitter_name: str | None = None
+    submitter_email: str
     state: SubmissionState | None = None
     validation_ruleset_version: str | None = None
     validation_json: Dict[str, Any] | None = None
     submission_time: datetime | None = None
     filename: str
+    
+
+class SubmissionAccepterDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
     accepter: str | None = None
     accepter_name: str | None = None
-    submitter_name: str | None = None
+    accepter_email: str
 
 
 class FilingTaskDTO(BaseModel):
