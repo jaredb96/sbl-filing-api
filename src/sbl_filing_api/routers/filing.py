@@ -13,7 +13,6 @@ from sbl_filing_api.entities.models.dto import (
     StateUpdateDTO,
     ContactInfoDTO,
     SubmissionState,
-    SubmissionAccepterDTO,
 )
 
 from sbl_filing_api.entities.repos import submission_repo as repo
@@ -111,7 +110,7 @@ async def get_submission(request: Request, id: int):
     return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
 
 
-@router.put("/institutions/{lei}/filings/{period_code}/submissions/{id}/accept", response_model=SubmissionAccepterDTO)
+@router.put("/institutions/{lei}/filings/{period_code}/submissions/{id}/accept", response_model=SubmissionDTO)
 @requires("authenticated")
 async def accept_submission(request: Request, id: int, lei: str, period_code: str):
     submission = await repo.get_submission(request.state.db_session, id)
@@ -128,16 +127,18 @@ async def accept_submission(request: Request, id: int, lei: str, period_code: st
             status_code=status.HTTP_403_FORBIDDEN,
             content=f"Submission {id} for LEI {lei} in filing period {period_code} is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be signed",
         )
-    submission.state = SubmissionState.SUBMISSION_ACCEPTED
-    await repo.update_submission(submission, request.state.db_session)
 
-    return await repo.update_submission_accepter(
+    await repo.update_submission_accepter(
         request.state.db_session,
         submission_id=id,
         accepter=request.user.id,
         accepter_name=request.user.name,
         accepter_email=request.user.email,
     )
+
+    submission.state = SubmissionState.SUBMISSION_ACCEPTED
+    submission = await repo.update_submission(submission, request.state.db_session)
+    return submission
 
 
 @router.put("/institutions/{lei}/filings/{period_code}/institution-snapshot-id", response_model=FilingDTO)

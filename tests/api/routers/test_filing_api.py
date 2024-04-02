@@ -574,12 +574,18 @@ class TestFilingApi:
         mock.return_value.state = SubmissionState.VALIDATION_SUCCESSFUL
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         update_mock.assert_called_once()
-        update_submission_accepter_mock.assert_called_once()
+        update_submission_accepter_mock.assert_called_once_with(
+            ANY,
+            submission_id=1,
+            accepter="123456-7890-ABCDEF-GHIJ",
+            accepter_name="test",
+            accepter_email="test@local.host",
+        )
 
-        assert update_mock.call_args.args[0].state == "SUBMISSION_ACCEPTED"
-        assert res.json()["accepter"] == "123456-7890-ABCDEF-GHIJ"
-        assert res.json()["accepter_name"] == "test"
-        assert res.json()["accepter_email"] == "test@local.host"
+        assert res.json()["state"] == "SUBMISSION_ACCEPTED"
+        assert res.json()["id"] == 1
+        assert res.json()["submitter"] == "test1@cfpb.gov"
+        assert res.json()["submitter_email"] == "test@local.host"
         assert res.status_code == 200
 
         mock.return_value = None
