@@ -3,7 +3,7 @@ import json
 from io import BytesIO
 from fastapi import UploadFile
 from regtech_data_validator.create_schemas import validate_phases
-from regtech_data_validator.cli import df_to_json
+from regtech_data_validator.data_formatters import df_to_json
 import pandas as pd
 import importlib.metadata as imeta
 from sbl_filing_api.entities.models.dao import SubmissionDAO, SubmissionState
