@@ -61,7 +61,7 @@ async def validate_and_update_submission(lei: str, submission: SubmissionDAO, co
     if not result[0]:
         submission.state = (
             SubmissionState.VALIDATION_WITH_ERRORS
-            if "error" in result[1]["validation_severity"].values
+            if "Error" in result[1]["validation_severity"].values
             else SubmissionState.VALIDATION_WITH_WARNINGS
         )
     else:
