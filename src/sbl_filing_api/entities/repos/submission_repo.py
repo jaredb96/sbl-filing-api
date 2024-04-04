@@ -23,7 +23,7 @@ from sbl_filing_api.entities.models.dao import (
     AccepterDAO,
     SubmitterDAO,
 )
-from sbl_filing_api.entities.models.dto import FilingPeriodDTO, FilingDTO, ContactInfoDTO, AccepterDTO
+from sbl_filing_api.entities.models.dto import FilingPeriodDTO, FilingDTO, ContactInfoDTO
 
 logger = logging.getLogger(__name__)
 

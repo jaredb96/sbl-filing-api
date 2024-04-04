@@ -120,7 +120,6 @@ async def get_submission(request: Request, id: int):
 @router.put("/institutions/{lei}/filings/{period_code}/submissions/{id}/accept", response_model=SubmissionDTO)
 @requires("authenticated")
 async def accept_submission(request: Request, id: int, lei: str, period_code: str):
-
     submission = await repo.get_submission(request.state.db_session, id)
     if not submission:
         return JSONResponse(
