@@ -1,4 +1,4 @@
-"""create submission_accepter table
+"""create accepter table
 
 Revision ID: 4a5e42bb5efa
 Revises: d0ab7f051052
@@ -21,16 +21,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.create_table(
-        "submission_accepter",
+        "accepter",
         sa.Column("id", sa.INTEGER, autoincrement=True),
         sa.Column("accepter", sa.String, nullable=False),
         sa.Column("accepter_name", sa.String, nullable=True),
         sa.Column("accepter_email", sa.String, nullable=False),
         sa.Column("submission", sa.Integer, unique=True),
-        sa.PrimaryKeyConstraint("id", name="submission_accepter_pkey"),
-        sa.ForeignKeyConstraint(["submission"], ["submission.id"], name="submission_accepter_submission_fkey"),
+        sa.PrimaryKeyConstraint("id", name="accepter_pkey"),
+        sa.ForeignKeyConstraint(["submission"], ["submission.id"], name="accepter_submission_fkey"),
     )
 
 
 def downgrade() -> None:
-    op.drop_table("submission_accepter")
+    op.drop_table("accepter")

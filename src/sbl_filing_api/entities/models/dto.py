@@ -4,27 +4,35 @@ from pydantic import BaseModel, ConfigDict
 from sbl_filing_api.entities.models.model_enums import FilingType, FilingTaskState, SubmissionState
 
 
-class SubmissionDTO(BaseModel):
+class SubmitterDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int | None = None
     submitter: str
     submitter_name: str | None = None
     submitter_email: str
+
+
+class AccepterDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
+    accepter: str
+    accepter_name: str | None = None
+    accepter_email: str
+
+
+class SubmissionDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int | None = None
     state: SubmissionState | None = None
     validation_ruleset_version: str | None = None
     validation_json: Dict[str, Any] | None = None
     submission_time: datetime | None = None
     filename: str
-
-
-class SubmissionAccepterDTO(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int | None = None
-    accepter: str | None = None
-    accepter_name: str | None = None
-    accepter_email: str
+    submitter: SubmitterDTO | None = None
+    accepter: AccepterDTO | None = None
 
 
 class FilingTaskDTO(BaseModel):
