@@ -221,6 +221,7 @@ def test_migration_to_4a5e42bb5efa(alembic_runner: MigrationContext, alembic_eng
         "accepter",
         "accepter_name",
         "accepter_email",
+        "acception_time",
     } == set([c["name"] for c in inspector.get_columns("accepter")])
 
     accepter_fk = inspector.get_foreign_keys("accepter")[0]

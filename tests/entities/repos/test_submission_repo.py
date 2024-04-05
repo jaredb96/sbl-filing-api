@@ -146,6 +146,7 @@ class TestSubmissionRepo:
             accepter="test@local.host",
             accepter_name="test accepter name",
             accepter_email="test@local.host",
+            acception_time=dt.now(),
         )
         transaction_session.add(accepter1)
 

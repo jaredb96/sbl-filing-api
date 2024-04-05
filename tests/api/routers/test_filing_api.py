@@ -544,6 +544,7 @@ class TestFilingApi:
             accepter="123456-7890-ABCDEF-GHIJ",
             accepter_name="test",
             accepter_email="test@local.host",
+            acception_time=datetime.datetime.now(),
         )
 
         update_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.update_submission")

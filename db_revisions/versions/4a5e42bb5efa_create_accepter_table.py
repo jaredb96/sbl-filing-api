@@ -27,6 +27,7 @@ def upgrade() -> None:
         sa.Column("accepter_name", sa.String, nullable=True),
         sa.Column("accepter_email", sa.String, nullable=False),
         sa.Column("submission", sa.Integer, unique=True),
+        sa.Column("acception_time", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         sa.PrimaryKeyConstraint("id", name="accepter_pkey"),
         sa.ForeignKeyConstraint(["submission"], ["submission.id"], name="accepter_submission_fkey"),
     )

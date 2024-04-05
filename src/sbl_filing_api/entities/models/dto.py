@@ -20,6 +20,7 @@ class AccepterDTO(BaseModel):
     accepter: str
     accepter_name: str | None = None
     accepter_email: str
+    acception_time: datetime | None = None
 
 
 class SubmissionDTO(BaseModel):

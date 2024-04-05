@@ -28,9 +28,10 @@ class AccepterDAO(Base):
     accepter: Mapped[str] = mapped_column(nullable=True)
     accepter_name: Mapped[str] = mapped_column(nullable=True)
     accepter_email: Mapped[str]
+    acception_time: Mapped[datetime] = mapped_column(server_default=func.now())
 
     def __str__(self):
-        return f"Acception ID: {self.id}, Accepter: {self.accepter}, Accepter Name: {self.accepter_name}, Accepter Email: {self.accepter_email}, Submission: {self.submission}"
+        return f"Acception ID: {self.id}, Accepter: {self.accepter}, Accepter Name: {self.accepter_name}, Accepter Email: {self.accepter_email}, Submission: {self.submission} Acception: {self.acception_time}"
 
 
 class SubmissionDAO(Base):
