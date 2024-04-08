@@ -19,6 +19,8 @@ from sbl_filing_api.entities.models.dao import (
     FilingTaskState,
     ContactInfoDAO,
     FilingDAO,
+    AccepterDAO,
+    SubmitterDAO,
 )
 from sbl_filing_api.entities.models.dto import ContactInfoDTO
 from sbl_filing_api.routers.dependencies import verify_lei
@@ -110,7 +112,6 @@ class TestFilingApi:
         mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submissions")
         mock.return_value = [
             SubmissionDAO(
-                submitter="test1@cfpb.gov",
                 filing=1,
                 state=SubmissionState.SUBMISSION_UPLOADED,
                 validation_ruleset_version="v1",
@@ -125,7 +126,6 @@ class TestFilingApi:
         mock.assert_called_with(ANY, "1234567890", "2024")
         assert res.status_code == 200
         assert len(results) == 1
-        assert results[0]["submitter"] == "test1@cfpb.gov"
         assert results[0]["state"] == SubmissionState.SUBMISSION_UPLOADED
 
         # verify an empty submission list returns ok
@@ -147,7 +147,6 @@ class TestFilingApi:
     async def test_get_latest_submission(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
         mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_latest_submission")
         mock.return_value = SubmissionDAO(
-            submitter="test1@cfpb.gov",
             filing=1,
             state=SubmissionState.VALIDATION_IN_PROGRESS,
             validation_ruleset_version="v1",
@@ -178,7 +177,6 @@ class TestFilingApi:
         mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submission")
         mock.return_value = SubmissionDAO(
             id=1,
-            submitter="test1@cfpb.gov",
             filing=1,
             state=SubmissionState.VALIDATION_WITH_ERRORS,
             validation_ruleset_version="v1",
@@ -208,7 +206,6 @@ class TestFilingApi:
             id=1,
             filing=1,
             state=SubmissionState.SUBMISSION_UPLOADED,
-            submitter="123456-7890-ABCDEF-GHIJ",
             filename="submission.csv",
         )
 
@@ -227,17 +224,28 @@ class TestFilingApi:
         mock_update_submission = mocker.patch(
             "sbl_filing_api.entities.repos.submission_repo.update_submission", side_effect=async_mock
         )
+        mock_add_submitter = mocker.patch("sbl_filing_api.entities.repos.submission_repo.add_submitter")
+        mock_add_submitter.return_value = SubmitterDAO(
+            id=1,
+            submission=1,
+            submitter="123456-7890-ABCDEF-GHIJ",
+            submitter_name="test",
+            submitter_email="test@local.host",
+        )
 
         files = {"file": ("submission.csv", open(submission_csv, "rb"))}
         client = TestClient(app_fixture)
 
         res = client.post("/v1/filing/institutions/1234567890/filings/2024/submissions", files=files)
-        mock_add_submission.assert_called_with(ANY, 1, "123456-7890-ABCDEF-GHIJ", "submission.csv")
+        mock_add_submission.assert_called_with(ANY, 1, "submission.csv")
         assert mock_update_submission.call_args.args[0].state == SubmissionState.SUBMISSION_UPLOADED
         assert res.status_code == 200
         assert res.json()["id"] == 1
         assert res.json()["state"] == SubmissionState.SUBMISSION_UPLOADED
-        assert res.json()["submitter"] == "123456-7890-ABCDEF-GHIJ"
+        assert res.json()["submitter"]["id"] == 1
+        assert res.json()["submitter"]["submitter"] == "123456-7890-ABCDEF-GHIJ"
+        assert res.json()["submitter"]["submitter_name"] == "test"
+        assert res.json()["submitter"]["submitter_email"] == "test@local.host"
 
         get_filing_mock.return_value = None
         res = client.post("/v1/filing/institutions/ABCDEFG/filings/2024/submissions", files=files)
@@ -542,23 +550,34 @@ class TestFilingApi:
         mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submission")
         mock.return_value = SubmissionDAO(
             id=1,
-            submitter="test1@cfpb.gov",
             filing=1,
             state=SubmissionState.VALIDATION_WITH_ERRORS,
             validation_ruleset_version="v1",
             submission_time=datetime.datetime.now(),
             filename="file1.csv",
         )
+
+        update_accepter_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.add_accepter")
+        update_accepter_mock.return_value = AccepterDAO(
+            id=1,
+            submission=1,
+            accepter="123456-7890-ABCDEF-GHIJ",
+            accepter_name="test",
+            accepter_email="test@local.host",
+            acception_time=datetime.datetime.now(),
+        )
+
         update_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.update_submission")
         update_mock.return_value = SubmissionDAO(
             id=1,
-            submitter="test1@cfpb.gov",
             filing=1,
             state=SubmissionState.SUBMISSION_ACCEPTED,
             validation_ruleset_version="v1",
             submission_time=datetime.datetime.now(),
             filename="file1.csv",
+            accepter=update_accepter_mock.return_value,
         )
+
         client = TestClient(app_fixture)
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         assert res.status_code == 403
@@ -570,8 +589,20 @@ class TestFilingApi:
         mock.return_value.state = SubmissionState.VALIDATION_SUCCESSFUL
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         update_mock.assert_called_once()
-        assert update_mock.call_args.args[0].state == "SUBMISSION_ACCEPTED"
-        assert update_mock.call_args.args[0].accepter == "123456-7890-ABCDEF-GHIJ"
+        update_accepter_mock.assert_called_once_with(
+            ANY,
+            submission_id=1,
+            accepter="123456-7890-ABCDEF-GHIJ",
+            accepter_name="test",
+            accepter_email="test@local.host",
+        )
+
+        assert res.json()["state"] == "SUBMISSION_ACCEPTED"
+        assert res.json()["id"] == 1
+        assert res.json()["accepter"]["id"] == 1
+        assert res.json()["accepter"]["accepter"] == "123456-7890-ABCDEF-GHIJ"
+        assert res.json()["accepter"]["accepter_name"] == "test"
+        assert res.json()["accepter"]["accepter_email"] == "test@local.host"
         assert res.status_code == 200
 
         mock.return_value = None

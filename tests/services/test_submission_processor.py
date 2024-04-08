@@ -109,7 +109,6 @@ class TestSubmissionProcessor:
             id=1,
             filing=1,
             state=SubmissionState.SUBMISSION_UPLOADED,
-            submitter="123456-7890-ABCDEF-GHIJ",
             filename="submission.csv",
         )
         file_mock = mocker.patch("sbl_filing_api.services.submission_processor.upload_to_storage")
@@ -134,7 +133,6 @@ class TestSubmissionProcessor:
             id=1,
             filing=1,
             state=SubmissionState.SUBMISSION_UPLOADED,
-            submitter="123456-7890-ABCDEF-GHIJ",
             filename="submission.csv",
         )
         file_mock = mocker.patch("sbl_filing_api.services.submission_processor.upload_to_storage")
@@ -158,7 +156,6 @@ class TestSubmissionProcessor:
             id=1,
             filing=1,
             state=SubmissionState.SUBMISSION_UPLOADED,
-            submitter="123456-7890-ABCDEF-GHIJ",
             filename="submission.csv",
         )
 
