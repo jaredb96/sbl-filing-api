@@ -614,7 +614,13 @@ class TestFilingApi:
         sub_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_latest_submission")
         sub_mock.return_value = SubmissionDAO(
             id=1,
-            submitter="test1@cfpb.gov",
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
             filing=1,
             state=SubmissionState.VALIDATION_IN_PROGRESS,
             validation_ruleset_version="v1",
@@ -654,7 +660,13 @@ class TestFilingApi:
         sub_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submission")
         sub_mock.return_value = SubmissionDAO(
             id=1,
-            submitter="test1@cfpb.gov",
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
             filing=1,
             state=SubmissionState.VALIDATION_IN_PROGRESS,
             validation_ruleset_version="v1",
