@@ -53,19 +53,26 @@ async def validate_and_update_submission(lei: str, submission: SubmissionDAO, co
     submission.state = SubmissionState.VALIDATION_IN_PROGRESS
     submission = await update_submission(submission)
 
-    df = pd.read_csv(BytesIO(content), dtype=str, na_filter=False)
+    try:
+        df = pd.read_csv(BytesIO(content), dtype=str, na_filter=False)
 
-    # Validate Phases
-    result = validate_phases(df, {"lei": lei})
+        # Validate Phases
+        result = validate_phases(df, {"lei": lei})
 
-    # Update tables with response
-    if not result[0]:
-        submission.state = (
-            SubmissionState.VALIDATION_WITH_ERRORS
-            if Severity.ERROR.value in result[1]["validation_severity"].values
-            else SubmissionState.VALIDATION_WITH_WARNINGS
-        )
-    else:
-        submission.state = SubmissionState.VALIDATION_SUCCESSFUL
-    submission.validation_json = json.loads(df_to_json(result[1]))
-    await update_submission(submission)
+        # Update tables with response
+        if not result[0]:
+            submission.state = (
+                SubmissionState.VALIDATION_WITH_ERRORS
+                if Severity.ERROR.value in result[1]["validation_severity"].values
+                else SubmissionState.VALIDATION_WITH_WARNINGS
+            )
+        else:
+            submission.state = SubmissionState.VALIDATION_SUCCESSFUL
+        submission.validation_json = json.loads(df_to_json(result[1]))
+        await update_submission(submission)
+
+    except RuntimeError as re:
+        log.error("The file is malformed", re, exc_info=True, stack_info=True)
+        submission.state = SubmissionState.SUBMISSION_UPLOAD_MALFORMED
+        await update_submission(submission)
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=re)
