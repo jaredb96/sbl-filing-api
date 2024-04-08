@@ -6,7 +6,6 @@ from unittest.mock import Mock, ANY
 from pytest_mock import MockerFixture
 from sbl_filing_api.config import FsProtocol, settings
 from sbl_filing_api.entities.models.dao import SubmissionDAO, SubmissionState
-import pandas as pd
 
 
 class TestSubmissionProcessor:
