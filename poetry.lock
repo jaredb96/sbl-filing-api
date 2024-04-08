@@ -701,13 +701,13 @@ packaging = "*"
 
 [[package]]
 name = "ecdsa"
-version = "0.18.0"
+version = "0.19.0"
 description = "ECDSA cryptographic signature library (pure python)"
 optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.6"
 files = [
-    {file = "ecdsa-0.18.0-py2.py3-none-any.whl", hash = "sha256:80600258e7ed2f16b9aa1d7c295bd70194109ad5a30fdee0eaeefef1d4c559dd"},
-    {file = "ecdsa-0.18.0.tar.gz", hash = "sha256:190348041559e21b22a1d65cee485282ca11a6f81d503fddb84d5017e9ed1e49"},
+    {file = "ecdsa-0.19.0-py2.py3-none-any.whl", hash = "sha256:2cea9b88407fdac7bbeca0833b189e4c9c53f2ef1e1eaa29f6224dbc809b707a"},
+    {file = "ecdsa-0.19.0.tar.gz", hash = "sha256:60eaad1199659900dd0af521ed462b793bbdf867432b3948e87416ae4caf6bf8"},
 ]
 
 [package.dependencies]
@@ -1889,13 +1889,13 @@ pycryptodome = ["pyasn1", "pycryptodome (>=3.3.1,<4.0.0)"]
 
 [[package]]
 name = "python-keycloak"
-version = "3.9.1"
+version = "3.11.1"
 description = "python-keycloak is a Python package providing access to the Keycloak API."
 optional = false
-python-versions = ">=3.8,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "python_keycloak-3.9.1-py3-none-any.whl", hash = "sha256:898d1fc73560171d3870251f981e069f854cc67bc0a51b96703355512d8d3cf3"},
-    {file = "python_keycloak-3.9.1.tar.gz", hash = "sha256:50c8073172ca0630f3569c6b631134216b60f4e347cc5bb669a57e6ffba50f7e"},
+    {file = "python_keycloak-3.11.1-py3-none-any.whl", hash = "sha256:3567a79edb6ad75955737469a756f33392349ad4e910875318c266ea4ef54926"},
+    {file = "python_keycloak-3.11.1.tar.gz", hash = "sha256:3caa2f457837718e015c032d71dd6068f7c99cc9410466228be7aeebc7d514a0"},
 ]
 
 [package.dependencies]
@@ -2032,7 +2032,7 @@ tabulate = "^0.9.0"
 type = "git"
 url = "https://github.com/cfpb/regtech-data-validator.git"
 reference = "HEAD"
-resolved_reference = "21ad3ccc7daf69dbb3d3283220b5915f770ded56"
+resolved_reference = "63b4735b85aca3837e7d7da0f587ac2580e0ab49"
 
 [[package]]
 name = "requests"
