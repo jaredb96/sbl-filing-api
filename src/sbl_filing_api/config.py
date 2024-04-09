@@ -18,12 +18,14 @@ if os.getenv("ENV", "LOCAL") == "LOCAL":
 class FsProtocol(StrEnum):
     FILE = "file"
     S3 = "s3"
-    
+
+
 class FsUploadConfig(BaseModel):
     protocol: str = FsProtocol.FILE.value
     root: str
     mkdir: bool = True
-    
+
+
 class FsDownloadConfig(BaseModel):
     protocol: str = FsProtocol.FILE.value
     download_args: Dict[str, Any] = {}
@@ -42,9 +44,9 @@ class Settings(BaseSettings):
     `file` is for local file system
     `s3` is for AWS S3
     """
-    #upload_fs_protocol: FsProtocol = FsProtocol.FILE
+    # upload_fs_protocol: FsProtocol = FsProtocol.FILE
     fs_upload_config: FsUploadConfig
-    
+
     fs_download_config: FsDownloadConfig
     """
     upload_fs_root: root of the upload folder in file system

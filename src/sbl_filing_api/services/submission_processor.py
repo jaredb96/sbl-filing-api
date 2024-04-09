@@ -13,7 +13,7 @@ from http import HTTPStatus
 from fastapi import HTTPException
 import logging
 from fsspec import AbstractFileSystem, filesystem
-from sbl_filing_api.config import settings, FsProtocol
+from sbl_filing_api.config import settings
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +42,9 @@ async def upload_to_storage(period_code: str, lei: str, file_identifier: str, co
         fs: AbstractFileSystem = filesystem(settings.fs_upload_config.protocol)
         if settings.fs_upload_config.mkdir:
             fs.mkdirs(f"{settings.fs_upload_config.root}/upload/{period_code}/{lei}", exist_ok=True)
-        with fs.open(f"{settings.fs_upload_config.root}/upload/{period_code}/{lei}/{file_identifier}.{extension}", "wb") as f:
+        with fs.open(
+            f"{settings.fs_upload_config.root}/upload/{period_code}/{lei}/{file_identifier}.{extension}", "wb"
+        ) as f:
             f.write(content)
     except Exception as e:
         log.error("Failed to upload file", e, exc_info=True, stack_info=True)
@@ -51,8 +53,9 @@ async def upload_to_storage(period_code: str, lei: str, file_identifier: str, co
 
 async def get_from_storage(period_code: str, lei: str, file_identifier: str, extension: str = "csv"):
     try:
-        #fs: AbstractFileSystem = filesystem("filecache", target_protocol='s3', cache_storage='/tmp/aws', check_files=True, version_aware=True)
-        fs: AbstractFileSystem = filesystem(settings.fs_download_config.protocol, **settings.fs_download_config.download_args)
+        fs: AbstractFileSystem = filesystem(
+            settings.fs_download_config.protocol, **settings.fs_download_config.download_args
+        )
         file_path = f"{settings.fs_upload_config.root}/upload/{period_code}/{lei}/{file_identifier}.{extension}"
         with fs.open(file_path, "r") as f:
             return f.name

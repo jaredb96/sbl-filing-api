@@ -11,7 +11,6 @@ from unittest.mock import ANY, Mock, AsyncMock
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
-from textwrap import dedent
 
 from sbl_filing_api.entities.models.dao import (
     SubmissionDAO,
@@ -649,7 +648,7 @@ class TestFilingApi:
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/latest/report")
         sub_mock.assert_called_with(ANY, "1234567890", "2024")
         assert res.status_code == 204
-        
+
         os.unlink(temp_file.name)
 
     async def test_get_sub_report(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
@@ -690,5 +689,5 @@ class TestFilingApi:
         res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/1/report")
         sub_mock.assert_called_with(ANY, 1)
         assert res.status_code == 204
-        
+
         os.unlink(temp_file.name)
