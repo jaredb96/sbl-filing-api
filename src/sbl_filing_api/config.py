@@ -1,11 +1,12 @@
 from enum import StrEnum
 import os
 from urllib import parse
-from typing import Any
+from typing import Any, Dict
 
 from pydantic import field_validator, ValidationInfo
 from pydantic.networks import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel
 
 from regtech_api_commons.oauth2.config import KeycloakSettings
 
@@ -17,6 +18,15 @@ if os.getenv("ENV", "LOCAL") == "LOCAL":
 class FsProtocol(StrEnum):
     FILE = "file"
     S3 = "s3"
+    
+class FsUploadConfig(BaseModel):
+    protocol: str = FsProtocol.FILE.value
+    root: str
+    mkdir: bool = True
+    
+class FsDownloadConfig(BaseModel):
+    protocol: str = FsProtocol.FILE.value
+    download_args: Dict[str, Any] = {}
 
 
 class Settings(BaseSettings):
@@ -32,13 +42,15 @@ class Settings(BaseSettings):
     `file` is for local file system
     `s3` is for AWS S3
     """
-    upload_fs_protocol: FsProtocol = FsProtocol.FILE
+    #upload_fs_protocol: FsProtocol = FsProtocol.FILE
+    fs_upload_config: FsUploadConfig
+    
+    fs_download_config: FsDownloadConfig
     """
     upload_fs_root: root of the upload folder in file system
     with `file` protocol, this can be any directory you specific (e.g. `../upload`)
     if using `s3` for the protocol, this should be the bucket name (e.g. `my-s3-bucket`)
     """
-    upload_fs_root: str
     submission_file_type: str = "text/csv"
     submission_file_extension: str = "csv"
     submission_file_size: int = 2 * (1024**3)
@@ -46,6 +58,7 @@ class Settings(BaseSettings):
     user_fi_api_url: str = "http://sbl-project-user_fi-1:8888/v1/institutions/"
 
     def __init__(self, **data):
+        print(f"Trying to set data {data}")
         super().__init__(**data)
 
     @field_validator("conn", mode="before")
