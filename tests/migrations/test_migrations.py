@@ -257,3 +257,7 @@ def test_migration_to_ffd779216f6d(alembic_runner: MigrationContext, alembic_eng
         and "submission" == submitter_fk["referred_table"]
         and "id" in submitter_fk["referred_columns"]
     )
+
+
+def test_migration_to_dcafabe9141e(alembic_runner: MigrationContext, alembic_engine: Engine):
+    alembic_runner.migrate_up_to("dcafabe9141e")

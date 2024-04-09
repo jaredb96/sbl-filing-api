@@ -99,7 +99,7 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         id=3,
         lei="ZXWVUTSRQP",
         filing_period="2024",
-        institution_snapshot_id="v1",
+        # institution_snapshot_id="v1",
         contact_info=ContactInfoDAO(
             id=3,
             filing=3,
