@@ -118,6 +118,8 @@ class TestSubmissionRepo:
             last_name="test_last_name_1",
             hq_address_street_1="address street 1",
             hq_address_street_2="",
+            hq_address_street_3="",
+            hq_address_street_4="",
             hq_address_city="Test City 1",
             hq_address_state="TS",
             hq_address_zip="12345",
@@ -131,6 +133,8 @@ class TestSubmissionRepo:
             last_name="test_last_name_2",
             hq_address_street_1="address street 2",
             hq_address_street_2="",
+            hq_address_street_3="",
+            hq_address_street_4="",
             hq_address_city="Test City 2",
             hq_address_state="TS",
             hq_address_zip="12345",
@@ -386,6 +390,8 @@ class TestSubmissionRepo:
         assert res.last_name == "test_last_name_2"
         assert res.hq_address_street_1 == "address street 2"
         assert res.hq_address_street_2 == ""
+        assert res.hq_address_street_3 == ""
+        assert res.hq_address_street_4 == ""
         assert res.hq_address_city == "Test City 2"
         assert res.hq_address_state == "TS"
         assert res.hq_address_zip == "12345"
@@ -402,6 +408,8 @@ class TestSubmissionRepo:
                 last_name="test_last_name_3",
                 hq_address_street_1="address street 1",
                 hq_address_street_2="",
+                hq_address_street_3="",
+                hq_address_street_4="",
                 hq_address_city="Test City",
                 hq_address_state="TS",
                 hq_address_zip="12345",
@@ -417,6 +425,8 @@ class TestSubmissionRepo:
         assert filing.contact_info.last_name == "test_last_name_3"
         assert filing.contact_info.hq_address_street_1 == "address street 1"
         assert filing.contact_info.hq_address_street_2 == ""
+        assert filing.contact_info.hq_address_street_3 == ""
+        assert filing.contact_info.hq_address_street_4 == ""
         assert filing.contact_info.hq_address_city == "Test City"
         assert filing.contact_info.hq_address_state == "TS"
         assert filing.contact_info.hq_address_zip == "12345"
@@ -435,6 +445,8 @@ class TestSubmissionRepo:
                 last_name="test_last_name_upd",
                 hq_address_street_1="address street upd",
                 hq_address_street_2="",
+                hq_address_street_3="",
+                hq_address_street_4="",
                 hq_address_city="Test City upd",
                 hq_address_state="TS",
                 hq_address_zip="12345",
@@ -450,6 +462,8 @@ class TestSubmissionRepo:
         assert filing.contact_info.last_name == "test_last_name_upd"
         assert filing.contact_info.hq_address_street_1 == "address street upd"
         assert filing.contact_info.hq_address_street_2 == ""
+        assert filing.contact_info.hq_address_street_3 == ""
+        assert filing.contact_info.hq_address_street_4 == ""
         assert filing.contact_info.hq_address_city == "Test City upd"
         assert filing.contact_info.hq_address_state == "TS"
         assert filing.contact_info.hq_address_zip == "12345"
