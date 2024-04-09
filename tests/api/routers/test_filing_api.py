@@ -5,12 +5,14 @@ import os
 import pytest
 
 from copy import deepcopy
+from datetime import datetime as dt
 
 from unittest.mock import ANY, Mock, AsyncMock
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
+from textwrap import dedent
 
 from sbl_filing_api.entities.models.dao import (
     SubmissionDAO,
@@ -18,12 +20,13 @@ from sbl_filing_api.entities.models.dao import (
     FilingTaskState,
     ContactInfoDAO,
     FilingDAO,
+    SignatureDAO,
     AccepterDAO,
     SubmitterDAO,
 )
 from sbl_filing_api.entities.models.dto import ContactInfoDTO
-
 from sbl_filing_api.routers.dependencies import verify_lei
+from sbl_filing_api.services import submission_processor
 
 from sqlalchemy.exc import IntegrityError
 
@@ -52,14 +55,14 @@ class TestFilingApi:
 
     def test_get_filing(self, app_fixture: FastAPI, get_filing_mock: Mock, authed_user_mock: Mock):
         client = TestClient(app_fixture)
-        res = client.get("/v1/filing/institutions/1234567890/filings/2024/")
-        get_filing_mock.assert_called_with(ANY, "1234567890", "2024")
+        res = client.get("/v1/filing/institutions/123456ABCDEF/filings/2024/")
+        get_filing_mock.assert_called_with(ANY, "123456ABCDEF", "2024")
         assert res.status_code == 200
-        assert res.json()["lei"] == "1234567890"
+        assert res.json()["lei"] == "123456ABCDEF"
         assert res.json()["filing_period"] == "2024"
 
         get_filing_mock.return_value = None
-        res = client.get("/v1/filing/institutions/1234567890/filings/2024/")
+        res = client.get("/v1/filing/institutions/123456ABCDEF/filings/2024/")
         assert res.status_code == 204
 
     def test_unauthed_post_filing(self, app_fixture: FastAPI):
@@ -582,7 +585,7 @@ class TestFilingApi:
         assert res.status_code == 403
         assert (
             res.json()
-            == "Submission 1 for LEI 1234567890 in filing period 2024 is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be signed"
+            == "Submission 1 for LEI 1234567890 in filing period 2024 is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be accepted."
         )
 
         mock.return_value.state = SubmissionState.VALIDATION_SUCCESSFUL
@@ -592,7 +595,7 @@ class TestFilingApi:
             ANY,
             submission_id=1,
             accepter="123456-7890-ABCDEF-GHIJ",
-            accepter_name="test",
+            accepter_name="Test User",
             accepter_email="test@local.host",
         )
 
@@ -608,3 +611,206 @@ class TestFilingApi:
         res = client.put("/v1/filing/institutions/1234567890/filings/2024/submissions/1/accept")
         assert res.status_code == 422
         assert res.json() == "Submission ID 1 does not exist, cannot accept a non-existing submission."
+
+    async def test_good_sign_filing(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, get_filing_mock: Mock
+    ):
+        mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_latest_submission")
+        mock.return_value = SubmissionDAO(
+            id=1,
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
+            filing=1,
+            state=SubmissionState.SUBMISSION_ACCEPTED,
+            validation_ruleset_version="v1",
+            submission_time=datetime.datetime.now(),
+            filename="file1.csv",
+        )
+
+        add_sig_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.add_signature")
+        add_sig_mock.return_value = SignatureDAO(
+            id=1,
+            filing=1,
+            signer_id="1234",
+            signer_name="Test user",
+            signer_email="test@local.host",
+            signed_date=datetime.datetime.now(),
+        )
+
+        upsert_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.upsert_filing")
+        updated_filing_obj = deepcopy(get_filing_mock.return_value)
+        upsert_mock.return_value = updated_filing_obj
+
+        client = TestClient(app_fixture)
+        res = client.put("/v1/filing/institutions/123456ABCDEF/filings/2024/sign")
+        add_sig_mock.assert_called_with(ANY, filing_id=1, user=authed_user_mock.return_value[1])
+        assert upsert_mock.call_args.args[1].confirmation_id.startswith("123456ABCDEF-2024-1-")
+        assert res.status_code == 200
+        assert float(upsert_mock.call_args.args[1].confirmation_id.split("-")[3]) == pytest.approx(
+            dt.now().timestamp(), abs=1.5
+        )
+
+    async def test_errors_sign_filing(
+        self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock, get_filing_mock: Mock
+    ):
+        sub_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_latest_submission")
+        sub_mock.return_value = SubmissionDAO(
+            id=1,
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
+            filing=1,
+            state=SubmissionState.VALIDATION_SUCCESSFUL,
+            validation_ruleset_version="v1",
+            submission_time=datetime.datetime.now(),
+            filename="file1.csv",
+        )
+
+        client = TestClient(app_fixture)
+        res = client.put("/v1/filing/institutions/123456ABCDEF/filings/2024/sign")
+        assert res.status_code == 403
+        assert (
+            res.json()
+            == "Cannot sign filing. Filing for 123456ABCDEF for period 2024 does not have a latest submission the SUBMISSION_ACCEPTED state."
+        )
+
+        sub_mock.return_value = None
+        res = client.put("/v1/filing/institutions/123456ABCDEF/filings/2024/sign")
+        assert res.status_code == 403
+        assert (
+            res.json()
+            == "Cannot sign filing. Filing for 123456ABCDEF for period 2024 does not have a latest submission the SUBMISSION_ACCEPTED state."
+        )
+
+        sub_mock.return_value = SubmissionDAO(
+            id=1,
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
+            filing=1,
+            state=SubmissionState.SUBMISSION_ACCEPTED,
+            validation_ruleset_version="v1",
+            submission_time=datetime.datetime.now(),
+            filename="file1.csv",
+        )
+
+        get_filing_mock.return_value.contact_info = None
+        res = client.put("/v1/filing/institutions/123456ABCDEF/filings/2024/sign")
+        assert res.status_code == 403
+        assert (
+            res.json()
+            == "Cannot sign filing. Filing for 123456ABCDEF for period 2024 does not have contact info defined."
+        )
+
+        get_filing_mock.return_value = None
+        res = client.put("/v1/filing/institutions/123456ABCDEF/filings/2024/sign")
+        assert res.status_code == 422
+        assert (
+            res.json()
+            == "There is no Filing for LEI 123456ABCDEF in period 2024, unable to sign a non-existent Filing."
+        )
+
+    async def test_get_latest_sub_report(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+        sub_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_latest_submission")
+        sub_mock.return_value = SubmissionDAO(
+            id=1,
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
+            filing=1,
+            state=SubmissionState.VALIDATION_IN_PROGRESS,
+            validation_ruleset_version="v1",
+            submission_time=datetime.datetime.now(),
+            filename="file1.csv",
+        )
+
+        expected_output = dedent(
+            """
+            validation_type,validation_id,validation_name,row,unique_identifier,fig_link,validation_description,field_1,value_1
+            Warning,W0003,uid.invalid_uid_lei,1,ZZZZZZZZZZZZZZZZZZZZZ1,https://www.consumerfinance.gov/data-research/small-business-lending/filing-instructions-guide/2024-guide/#4.4.1,"* The first 20 characters of the 'unique identifier' should
+            match the Legal Entity Identifier (LEI) for the financial institution.
+            ",uid,ZZZZZZZZZZZZZZZZZZZZZ1
+            Warning,W0003,uid.invalid_uid_lei,2,ZZZZZZZZZZZZZZZZZZZZZS,https://www.consumerfinance.gov/data-research/small-business-lending/filing-instructions-guide/2024-guide/#4.4.1,"* The first 20 characters of the 'unique identifier' should
+            match the Legal Entity Identifier (LEI) for the financial institution.
+            ",uid,ZZZZZZZZZZZZZZZZZZZZZS
+        """
+        ).strip("\n")
+        file_mock = mocker.patch("sbl_filing_api.services.submission_processor.get_from_storage")
+        file_mock.return_value = expected_output
+
+        client = TestClient(app_fixture)
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/latest/report")
+        sub_mock.assert_called_with(ANY, "1234567890", "2024")
+        file_mock.assert_called_with("2024", "1234567890", "1" + submission_processor.REPORT_QUALIFIER)
+        assert res.status_code == 200
+        assert res.text == expected_output
+        assert res.headers["content-type"] == "text/csv; charset=utf-8"
+
+        sub_mock.return_value = []
+        client = TestClient(app_fixture)
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/latest/report")
+        sub_mock.assert_called_with(ANY, "1234567890", "2024")
+        assert res.status_code == 204
+
+    async def test_get_sub_report(self, mocker: MockerFixture, app_fixture: FastAPI, authed_user_mock: Mock):
+        sub_mock = mocker.patch("sbl_filing_api.entities.repos.submission_repo.get_submission")
+        sub_mock.return_value = SubmissionDAO(
+            id=1,
+            submitter=SubmitterDAO(
+                id=1,
+                submission=1,
+                submitter="1234-5678-ABCD-EFGH",
+                submitter_name="Test User",
+                submitter_email="test1@cfpb.gov",
+            ),
+            filing=1,
+            state=SubmissionState.VALIDATION_IN_PROGRESS,
+            validation_ruleset_version="v1",
+            submission_time=datetime.datetime.now(),
+            filename="file1.csv",
+        )
+
+        expected_output = dedent(
+            """
+            validation_type,validation_id,validation_name,row,unique_identifier,fig_link,validation_description,field_1,value_1
+            Warning,W0003,uid.invalid_uid_lei,1,ZZZZZZZZZZZZZZZZZZZZZ1,https://www.consumerfinance.gov/data-research/small-business-lending/filing-instructions-guide/2024-guide/#4.4.1,"* The first 20 characters of the 'unique identifier' should
+            match the Legal Entity Identifier (LEI) for the financial institution.
+            ",uid,ZZZZZZZZZZZZZZZZZZZZZ1
+            Warning,W0003,uid.invalid_uid_lei,2,ZZZZZZZZZZZZZZZZZZZZZS,https://www.consumerfinance.gov/data-research/small-business-lending/filing-instructions-guide/2024-guide/#4.4.1,"* The first 20 characters of the 'unique identifier' should
+            match the Legal Entity Identifier (LEI) for the financial institution.
+            ",uid,ZZZZZZZZZZZZZZZZZZZZZS
+        """
+        ).strip("\n")
+        file_mock = mocker.patch("sbl_filing_api.services.submission_processor.get_from_storage")
+        file_mock.return_value = expected_output
+
+        client = TestClient(app_fixture)
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/1/report")
+        sub_mock.assert_called_with(ANY, 1)
+        file_mock.assert_called_with("2024", "1234567890", "1" + submission_processor.REPORT_QUALIFIER)
+        assert res.status_code == 200
+        assert res.text == expected_output
+        assert res.headers["content-type"] == "text/csv; charset=utf-8"
+
+        sub_mock.return_value = []
+        client = TestClient(app_fixture)
+        res = client.get("/v1/filing/institutions/1234567890/filings/2024/submissions/1/report")
+        sub_mock.assert_called_with(ANY, 1)
+        assert res.status_code == 204

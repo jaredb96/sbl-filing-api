@@ -61,11 +61,21 @@ class ContactInfoDTO(BaseModel):
     last_name: str
     hq_address_street_1: str
     hq_address_street_2: str | None = None
+    hq_address_street_3: str | None = None
+    hq_address_street_4: str | None = None
     hq_address_city: str
     hq_address_state: str
     hq_address_zip: str
     email: str
     phone: str
+
+
+class SignatureDTO(BaseModel):
+    id: int
+    signer_id: str
+    signer_name: str | None = None
+    signer_email: str
+    signed_date: datetime
 
 
 class FilingDTO(BaseModel):
@@ -78,6 +88,7 @@ class FilingDTO(BaseModel):
     institution_snapshot_id: str | None = None
     contact_info: ContactInfoDTO | None = None
     confirmation_id: str | None = None
+    signatures: List[SignatureDTO] = []
 
 
 class FilingPeriodDTO(BaseModel):

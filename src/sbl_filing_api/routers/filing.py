@@ -1,5 +1,7 @@
+import io
+
 from fastapi import Depends, Request, UploadFile, BackgroundTasks, status, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from regtech_api_commons.api.router_wrapper import Router
 from sbl_filing_api.services import submission_processor
 from typing import Annotated, List
@@ -67,6 +69,32 @@ async def post_filing(request: Request, lei: str, period_code: str):
         )
 
 
+@router.put("/institutions/{lei}/filings/{period_code}/sign", response_model=FilingDTO)
+@requires("authenticated")
+async def sign_filing(request: Request, lei: str, period_code: str):
+    filing = await repo.get_filing(request.state.db_session, lei, period_code)
+    if not filing:
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content=f"There is no Filing for LEI {lei} in period {period_code}, unable to sign a non-existent Filing.",
+        )
+    latest_sub = await repo.get_latest_submission(request.state.db_session, lei, period_code)
+    if not latest_sub or latest_sub.state != SubmissionState.SUBMISSION_ACCEPTED:
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content=f"Cannot sign filing. Filing for {lei} for period {period_code} does not have a latest submission the SUBMISSION_ACCEPTED state.",
+        )
+    if not filing.contact_info:
+        return JSONResponse(
+            status_code=status.HTTP_403_FORBIDDEN,
+            content=f"Cannot sign filing. Filing for {lei} for period {period_code} does not have contact info defined.",
+        )
+    sig = await repo.add_signature(request.state.db_session, filing_id=filing.id, user=request.user)
+    filing.confirmation_id = lei + "-" + period_code + "-" + str(latest_sub.id) + "-" + str(sig.signed_date.timestamp())
+    filing.signatures.append(sig)
+    return await repo.upsert_filing(request.state.db_session, filing)
+
+
 @router.post("/institutions/{lei}/filings/{period_code}/submissions", response_model=SubmissionDTO)
 @requires("authenticated")
 async def upload_file(
@@ -96,7 +124,9 @@ async def upload_file(
 
     submission.state = SubmissionState.SUBMISSION_UPLOADED
     submission = await repo.update_submission(submission)
+    background_tasks.add_task(
     background_tasks.add_task(submission_processor.validate_and_update_submission, lei, submission, content)
+    )
 
     return submission
 
@@ -140,7 +170,7 @@ async def accept_submission(request: Request, id: int, lei: str, period_code: st
     ):
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
-            content=f"Submission {id} for LEI {lei} in filing period {period_code} is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be signed",
+            content=f"Submission {id} for LEI {lei} in filing period {period_code} is not in an acceptable state.  Submissions must be validated successfully or with only warnings to be accepted.",
         )
 
     updated_accepter = await repo.add_accepter(
@@ -194,3 +224,27 @@ async def put_contact_info(request: Request, lei: str, period_code: str, contact
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=f"A Filing for the LEI ({lei}) and period ({period_code}) that was attempted to be updated does not exist.",
     )
+
+
+@router.get("/institutions/{lei}/filings/{period_code}/submissions/latest/report")
+@requires("authenticated")
+async def get_latest_submission_report(request: Request, lei: str, period_code: str):
+    latest_sub = await repo.get_latest_submission(request.state.db_session, lei, period_code)
+    if latest_sub:
+        file_data = await submission_processor.get_from_storage(
+            period_code, lei, str(latest_sub.id) + submission_processor.REPORT_QUALIFIER
+        )
+        return StreamingResponse(io.StringIO(file_data), media_type="text/csv")
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+
+
+@router.get("/institutions/{lei}/filings/{period_code}/submissions/{id}/report")
+@requires("authenticated")
+async def get_submission_report(request: Request, lei: str, period_code: str, id: int):
+    sub = await repo.get_submission(request.state.db_session, id)
+    if sub:
+        file_data = await submission_processor.get_from_storage(
+            period_code, lei, str(sub.id) + submission_processor.REPORT_QUALIFIER
+        )
+        return StreamingResponse(io.StringIO(file_data), media_type="text/csv")
+    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)

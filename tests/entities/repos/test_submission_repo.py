@@ -118,6 +118,8 @@ class TestSubmissionRepo:
             last_name="test_last_name_1",
             hq_address_street_1="address street 1",
             hq_address_street_2="",
+            hq_address_street_3="",
+            hq_address_street_4="",
             hq_address_city="Test City 1",
             hq_address_state="TS",
             hq_address_zip="12345",
@@ -131,6 +133,8 @@ class TestSubmissionRepo:
             last_name="test_last_name_2",
             hq_address_street_1="address street 2",
             hq_address_street_2="",
+            hq_address_street_3="",
+            hq_address_street_4="",
             hq_address_city="Test City 2",
             hq_address_state="TS",
             hq_address_zip="12345",
@@ -230,6 +234,19 @@ class TestSubmissionRepo:
         assert filing_task_states[0].change_timestamp.timestamp() == pytest.approx(
             seconds_now, abs=1.5
         )  # allow for possible 1.5 second difference
+
+    async def test_add_signature(
+        self, query_session: AsyncSession, transaction_session: AsyncSession, authed_user_mock: AuthenticatedUser
+    ):
+        await repo.add_signature(transaction_session, filing_id=1, user=authed_user_mock)
+        filing = await repo.get_filing(query_session, lei="1234567890", filing_period="2024")
+
+        assert filing.signatures[0].id == 1
+        assert filing.signatures[0].signer_id == "123456-7890-ABCDEF-GHIJ"
+        assert filing.signatures[0].signer_name == "Test User"
+        assert filing.signatures[0].signer_email == "test@local.host"
+        assert filing.signatures[0].filing == 1
+        assert filing.signatures[0].signed_date.timestamp() == pytest.approx(dt.utcnow().timestamp(), abs=1.0)
 
     async def test_add_filing_task(self, query_session: AsyncSession, transaction_session: AsyncSession):
         user = AuthenticatedUser.from_claim({"preferred_username": "testuser"})
@@ -386,6 +403,8 @@ class TestSubmissionRepo:
         assert res.last_name == "test_last_name_2"
         assert res.hq_address_street_1 == "address street 2"
         assert res.hq_address_street_2 == ""
+        assert res.hq_address_street_3 == ""
+        assert res.hq_address_street_4 == ""
         assert res.hq_address_city == "Test City 2"
         assert res.hq_address_state == "TS"
         assert res.hq_address_zip == "12345"
@@ -402,6 +421,8 @@ class TestSubmissionRepo:
                 last_name="test_last_name_3",
                 hq_address_street_1="address street 1",
                 hq_address_street_2="",
+                hq_address_street_3="",
+                hq_address_street_4="",
                 hq_address_city="Test City",
                 hq_address_state="TS",
                 hq_address_zip="12345",
@@ -417,6 +438,8 @@ class TestSubmissionRepo:
         assert filing.contact_info.last_name == "test_last_name_3"
         assert filing.contact_info.hq_address_street_1 == "address street 1"
         assert filing.contact_info.hq_address_street_2 == ""
+        assert filing.contact_info.hq_address_street_3 == ""
+        assert filing.contact_info.hq_address_street_4 == ""
         assert filing.contact_info.hq_address_city == "Test City"
         assert filing.contact_info.hq_address_state == "TS"
         assert filing.contact_info.hq_address_zip == "12345"
@@ -435,6 +458,8 @@ class TestSubmissionRepo:
                 last_name="test_last_name_upd",
                 hq_address_street_1="address street upd",
                 hq_address_street_2="",
+                hq_address_street_3="",
+                hq_address_street_4="",
                 hq_address_city="Test City upd",
                 hq_address_state="TS",
                 hq_address_zip="12345",
@@ -450,6 +475,8 @@ class TestSubmissionRepo:
         assert filing.contact_info.last_name == "test_last_name_upd"
         assert filing.contact_info.hq_address_street_1 == "address street upd"
         assert filing.contact_info.hq_address_street_2 == ""
+        assert filing.contact_info.hq_address_street_3 == ""
+        assert filing.contact_info.hq_address_street_4 == ""
         assert filing.contact_info.hq_address_city == "Test City upd"
         assert filing.contact_info.hq_address_state == "TS"
         assert filing.contact_info.hq_address_zip == "12345"
