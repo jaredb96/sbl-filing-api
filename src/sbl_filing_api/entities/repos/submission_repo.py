@@ -20,6 +20,7 @@ from sbl_filing_api.entities.models.dao import (
     FilingTaskProgressDAO,
     FilingTaskState,
     ContactInfoDAO,
+    SignatureDAO,
     AccepterDAO,
     SubmitterDAO,
 )
@@ -111,6 +112,11 @@ async def add_submission(
 async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSession = None) -> SubmissionDAO:
     session = incoming_session if incoming_session else SessionLocal()
     return await upsert_helper(session, submission, SubmissionDAO)
+
+
+async def add_signature(session: AsyncSession, filing_id: int, user: AuthenticatedUser) -> SignatureDAO:
+    sig = SignatureDAO(signer_id=user.id, signer_name=user.name, signer_email=user.email, filing=filing_id)
+    return await upsert_helper(session, sig, SignatureDAO)
 
 
 async def upsert_filing_period(session: AsyncSession, filing_period: FilingPeriodDTO) -> FilingPeriodDAO:
