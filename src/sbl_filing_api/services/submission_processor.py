@@ -51,11 +51,13 @@ async def upload_to_storage(period_code: str, lei: str, file_identifier: str, co
 
 async def get_from_storage(period_code: str, lei: str, file_identifier: str, extension: str = "csv"):
     try:
-        fs: AbstractFileSystem = filesystem(settings.upload_fs_protocol.value)
+        if settings.upload_fs_protocol == FsProtocol.S3:
+            fs: AbstractFileSystem = filesystem("filecache", target_protocol='s3', cache_storage='/tmp/aws', check_files=True, version_aware=True)
+        else:
+            fs: AbstractFileSystem = filesystem(settings.upload_fs_protocol.value)
         file_path = f"{settings.upload_fs_root}/upload/{period_code}/{lei}/{file_identifier}.{extension}"
         with fs.open(file_path, "r") as f:
-            file_data = f.read()
-            return file_data
+            return f.name
     except Exception as e:
         log.error(f"Failed to read file {file_path}:", e, exc_info=True, stack_info=True)
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail="Failed to read file.")
