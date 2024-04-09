@@ -74,7 +74,6 @@ def get_filing_mock(mocker: MockerFixture) -> Mock:
         id=1,
         lei="1234567890",
         filing_period="2024",
-        institution_snapshot_id="v1",
         contact_info=ContactInfoDAO(
             id=1,
             filing=1,
@@ -99,7 +98,6 @@ def post_filing_mock(mocker: MockerFixture) -> Mock:
         id=3,
         lei="ZXWVUTSRQP",
         filing_period="2024",
-        # institution_snapshot_id="v1",
         contact_info=ContactInfoDAO(
             id=3,
             filing=3,
