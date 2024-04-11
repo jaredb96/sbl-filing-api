@@ -45,7 +45,7 @@ def run_migrations():
 app = FastAPI(lifespan=lifespan)
 
 
-@repeat_every(seconds=settings.expired_submission_check_secs, wait_first=True, logger=log)  # 1 hour
+@repeat_every(seconds=settings.expired_submission_check_secs, wait_first=True, logger=log)
 async def check_expired_submissions() -> None:
     await submission_repo.check_expired_submissions()
 
