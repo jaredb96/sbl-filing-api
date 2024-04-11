@@ -106,10 +106,19 @@ class TestSubmissionRepo:
             submission_time=dt.now(),
             filename="file3.csv",
         )
+        submission4 = SubmissionDAO(
+            id=40,
+            filing=1,
+            state=SubmissionState.SUBMISSION_UPLOADED,
+            validation_ruleset_version="v1",
+            submission_time=dt.fromtimestamp(1712611157.19126),
+            filename="file4.csv",
+        )
 
         transaction_session.add(submission1)
         transaction_session.add(submission2)
         transaction_session.add(submission3)
+        transaction_session.add(submission4)
 
         contact_info1 = ContactInfoDAO(
             id=1,
@@ -526,6 +535,21 @@ class TestSubmissionRepo:
         assert submitter.submitter == "test2@cfpb.gov"
         assert submitter.submitter_name == "test2 submitter name"
         assert submitter.submitter_email == "test2@cfpb.gov"
+
+    async def test_expired_submission(
+        self, query_session: AsyncSession, mocker: MockerFixture, session_generator: async_scoped_session
+    ):
+        mocker.patch.object(repo, "SessionLocal", return_value=session_generator)
+
+        await repo.check_expired_submissions()
+
+        async def query_expired_submission():
+            async with session_generator() as search_session:
+                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 40)
+                exp_sub = await search_session.scalar(stmt)
+                assert exp_sub.state == SubmissionState.VALIDATION_EXPIRED
+
+        await query_expired_submission()
 
     def get_error_json(self):
         df_columns = [

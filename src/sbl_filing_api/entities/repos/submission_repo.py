@@ -1,5 +1,7 @@
 import logging
 
+from datetime import datetime
+
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, List, TypeVar
@@ -13,7 +15,6 @@ from async_lru import alru_cache
 
 from sbl_filing_api.entities.models.dao import (
     SubmissionDAO,
-    SubmissionState,
     FilingPeriodDAO,
     FilingDAO,
     FilingTaskDAO,
@@ -25,6 +26,8 @@ from sbl_filing_api.entities.models.dao import (
     SubmitterDAO,
 )
 from sbl_filing_api.entities.models.dto import FilingPeriodDTO, FilingDTO, ContactInfoDTO
+from sbl_filing_api.entities.models.model_enums import SubmissionState
+from sbl_filing_api.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +115,22 @@ async def add_submission(
 async def update_submission(submission: SubmissionDAO, incoming_session: AsyncSession = None) -> SubmissionDAO:
     session = incoming_session if incoming_session else SessionLocal()
     return await upsert_helper(session, submission, SubmissionDAO)
+
+
+async def check_expired_submissions():
+    session = SessionLocal()
+    check_states = [
+        SubmissionState.SUBMISSION_STARTED.value,
+        SubmissionState.SUBMISSION_UPLOADED.value,
+        SubmissionState.VALIDATION_IN_PROGRESS.value,
+    ]
+    stmt = select(SubmissionDAO).filter(SubmissionDAO.state.in_(check_states))
+    submissions = (await session.scalars(stmt)).all()
+    for s in submissions:
+        if abs(s.submission_time.timestamp() - datetime.now().timestamp()) > settings.expired_submission_diff_secs:
+            s.state = SubmissionState.VALIDATION_EXPIRED
+            await session.merge(s)
+    await session.commit()
 
 
 async def add_signature(session: AsyncSession, filing_id: int, user: AuthenticatedUser) -> SignatureDAO:
