@@ -18,18 +18,27 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+# fmt: off
 old_options = (
-    "SUBMISSION_UPLOADED",
-    "VALIDATION_IN_PROGRESS",
-    "VALIDATION_WITH_ERRORS",
-    "VALIDATION_WITH_WARNINGS",
-    "VALIDATION_SUCCESSFUL",
-    "SUBMISSION_ACCEPTED",
-    "SUBMISSION_STARTED",
+    'SUBMISSION_SIGNED',
+    'SUBMISSION_STARTED',
+    'SUBMISSION_UPLOADED',
+    'VALIDATION_IN_PROGRESS',
+    'VALIDATION_WITH_ERRORS',
+    'VALIDATION_WITH_WARNINGS',
+    'VALIDATION_SUCCESSFUL',
 )
-new_options = sorted(old_options + ("SUBMISSION_UPLOAD_MALFORMED",))
-
-
+new_options = (
+    'SUBMISSION_ACCEPTED',
+    'SUBMISSION_STARTED',
+    'SUBMISSION_UPLOADED',
+    'VALIDATION_IN_PROGRESS',
+    'VALIDATION_WITH_ERRORS',
+    'VALIDATION_WITH_WARNINGS',
+    'VALIDATION_SUCCESSFUL',
+    'SUBMISSION_UPLOAD_MALFORMED',
+)
+# fmt: on
 def upgrade() -> None:
     if "sqlite" not in context.get_context().dialect.name:
         op.execute("ALTER TYPE submissionstate RENAME TO submissionstate_old")
