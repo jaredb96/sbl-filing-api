@@ -95,7 +95,7 @@ class TestSubmissionRepo:
             filing=2,
             state=SubmissionState.SUBMISSION_UPLOADED,
             validation_ruleset_version="v1",
-            submission_time=(dt.now() - datetime.timedelta(seconds=1000)),
+            submission_time=(dt.now() - datetime.timedelta(seconds=200)),
             filename="file2.csv",
         )
         submission3 = SubmissionDAO(
@@ -107,11 +107,11 @@ class TestSubmissionRepo:
             filename="file3.csv",
         )
         submission4 = SubmissionDAO(
-            id=40,
+            id=4,
             filing=1,
             state=SubmissionState.SUBMISSION_UPLOADED,
             validation_ruleset_version="v1",
-            submission_time=dt.fromtimestamp(1712611157.19126),
+            submission_time=(dt.now() - datetime.timedelta(seconds=400)),
             filename="file4.csv",
         )
 
@@ -339,8 +339,8 @@ class TestSubmissionRepo:
 
     async def test_get_submissions(self, query_session: AsyncSession):
         res = await repo.get_submissions(query_session)
-        assert len(res) == 3
-        assert {1, 2, 3} == set([s.id for s in res])
+        assert len(res) == 4
+        assert {1, 2, 3, 4} == set([s.id for s in res])
         assert res[1].filing == 2
         assert res[2].state == SubmissionState.SUBMISSION_UPLOADED
 
@@ -360,7 +360,7 @@ class TestSubmissionRepo:
             filing_id=1,
             filename="file1.csv",
         )
-        assert res.id == 4
+        assert res.id == 5
         assert res.filing == 1
         assert res.state == SubmissionState.SUBMISSION_STARTED
 
@@ -377,9 +377,9 @@ class TestSubmissionRepo:
 
         async def query_updated_dao():
             async with session_generator() as search_session:
-                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 4)
+                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 5)
                 new_res1 = await search_session.scalar(stmt)
-                assert new_res1.id == 4
+                assert new_res1.id == 5
                 assert new_res1.filing == 1
                 assert new_res1.state == SubmissionState.VALIDATION_IN_PROGRESS
 
@@ -394,9 +394,9 @@ class TestSubmissionRepo:
 
         async def query_updated_dao():
             async with session_generator() as search_session:
-                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 4)
+                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 5)
                 new_res2 = await search_session.scalar(stmt)
-                assert new_res2.id == 4
+                assert new_res2.id == 5
                 assert new_res2.filing == 1
                 assert new_res2.state == SubmissionState.VALIDATION_WITH_ERRORS
                 assert new_res2.validation_json == validation_json
@@ -545,9 +545,11 @@ class TestSubmissionRepo:
 
         async def query_expired_submission():
             async with session_generator() as search_session:
-                stmt = select(SubmissionDAO).filter(SubmissionDAO.id == 40)
-                exp_sub = await search_session.scalar(stmt)
-                assert exp_sub.state == SubmissionState.VALIDATION_EXPIRED
+                stmt = select(SubmissionDAO).filter(SubmissionDAO.state == SubmissionState.VALIDATION_EXPIRED.value)
+                exp_sub = (await search_session.scalars(stmt)).all()
+                assert len(exp_sub) == 1
+                assert exp_sub[0].state == SubmissionState.VALIDATION_EXPIRED
+                assert exp_sub[0].id == 4
 
         await query_expired_submission()
 
