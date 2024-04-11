@@ -8,13 +8,13 @@ Create Date: 2024-04-07 01:02:13.310717
 
 from typing import Sequence, Union
 
-from alembic import op
+from alembic import op, context
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
 revision: str = "ccc50ec18a7e"
-down_revision: Union[str, None] = "ffd779216f6d"
+down_revision: Union[str, None] = "fb46d55283d6"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -32,20 +32,16 @@ new_options = sorted(old_options + ("SUBMISSION_UPLOAD_MALFORMED",))
 
 
 def upgrade() -> None:
-    with op.batch_alter_table("submission", schema=None) as batch_op:
-        batch_op.alter_column(
-            "state",
-            type_=sa.Enum(*new_options, name="submissionstate"),
-            existing_type=sa.Enum(*old_options, name="submissionstate"),
-            existing_server_default=sa.text("'text'"),
-        )
+    if "sqlite" not in context.get_context().dialect.name:
+        op.execute("ALTER TYPE submissionstate RENAME TO submissionstate_old")
+        op.execute(f"CREATE TYPE submissionstate AS ENUM{new_options}")
+        op.execute("ALTER TABLE submission ALTER COLUMN state TYPE submissionstate USING state::text::submissionstate")
+        op.execute("DROP TYPE submissionstate_old")
 
 
 def downgrade() -> None:
-    with op.batch_alter_table("submission", schema=None) as batch_op:
-        batch_op.alter_column(
-            "state",
-            type_=sa.Enum(*old_options, name="submissionstate"),
-            existing_type=sa.Enum(*new_options, name="submissionstate"),
-            existing_server_default=sa.text("'text'"),
-        )
+    if "sqlite" not in context.get_context().dialect.name:
+        op.execute("ALTER TYPE submissionstate RENAME TO submissionstate_old")
+        op.execute(f"CREATE TYPE submissionstate AS ENUM{old_options}")
+        op.execute("ALTER TABLE submission ALTER COLUMN state TYPE submissionstate USING state::text::submissionstate")
+        op.execute("DROP TYPE submissionstate_old")

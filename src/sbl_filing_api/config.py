@@ -3,7 +3,7 @@ import os
 from urllib import parse
 from typing import Any
 
-from pydantic import field_validator, ValidationInfo
+from pydantic import field_validator, ValidationInfo, BaseModel
 from pydantic.networks import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,6 +19,20 @@ class FsProtocol(StrEnum):
     S3 = "s3"
 
 
+class FsUploadConfig(BaseModel):
+    protocol: str = FsProtocol.FILE.value
+    root: str
+    mkdir: bool = True
+
+
+class FsDownloadConfig(BaseModel):
+    protocol: str = FsProtocol.FILE.value
+    target_protocol: str = None
+    cache_storage: str = None
+    check_files: bool = True
+    version_aware: bool = True
+
+
 class Settings(BaseSettings):
     db_schema: str = "public"
     db_name: str
@@ -27,18 +41,10 @@ class Settings(BaseSettings):
     db_host: str
     db_scheme: str = "postgresql+asyncpg"
     conn: PostgresDsn | None = None
-    """
-    upload_fs_protocol: to be used with fsspec, and s3fs
-    `file` is for local file system
-    `s3` is for AWS S3
-    """
-    upload_fs_protocol: FsProtocol = FsProtocol.FILE
-    """
-    upload_fs_root: root of the upload folder in file system
-    with `file` protocol, this can be any directory you specific (e.g. `../upload`)
-    if using `s3` for the protocol, this should be the bucket name (e.g. `my-s3-bucket`)
-    """
-    upload_fs_root: str
+
+    fs_upload_config: FsUploadConfig
+    fs_download_config: FsDownloadConfig
+
     submission_file_type: str = "text/csv"
     submission_file_extension: str = "csv"
     submission_file_size: int = 2 * (1024**3)
@@ -60,7 +66,7 @@ class Settings(BaseSettings):
         )
         return str(postgres_dsn)
 
-    model_config = SettingsConfigDict(env_file=env_files_to_load, extra="allow")
+    model_config = SettingsConfigDict(env_file=env_files_to_load, extra="allow", env_nested_delimiter="__")
 
 
 settings = Settings()
