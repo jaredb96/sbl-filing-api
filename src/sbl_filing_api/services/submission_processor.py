@@ -68,21 +68,30 @@ async def validate_and_update_submission(period_code: str, lei: str, submission:
     submission.state = SubmissionState.VALIDATION_IN_PROGRESS
     submission = await update_submission(submission)
 
-    df = pd.read_csv(BytesIO(content), dtype=str, na_filter=False)
+    try:
+        df = pd.read_csv(BytesIO(content), dtype=str, na_filter=False)
 
-    # Validate Phases
-    result = validate_phases(df, {"lei": lei})
+        # Validate Phases
+        result = validate_phases(df, {"lei": lei})
 
-    # Update tables with response
-    if not result[0]:
-        submission.state = (
-            SubmissionState.VALIDATION_WITH_ERRORS
-            if Severity.ERROR.value in result[1]["validation_severity"].values
-            else SubmissionState.VALIDATION_WITH_WARNINGS
+        # Update tables with response
+        if not result[0]:
+            submission.state = (
+                SubmissionState.VALIDATION_WITH_ERRORS
+                if Severity.ERROR.value in result[1]["validation_severity"].values
+                else SubmissionState.VALIDATION_WITH_WARNINGS
+            )
+        else:
+            submission.state = SubmissionState.VALIDATION_SUCCESSFUL
+        submission.validation_json = json.loads(df_to_json(result[1]))
+        submission_report = df_to_download(result[1])
+        await upload_to_storage(
+            period_code, lei, str(submission.id) + REPORT_QUALIFIER, submission_report.encode("utf-8")
         )
-    else:
-        submission.state = SubmissionState.VALIDATION_SUCCESSFUL
-    submission.validation_json = json.loads(df_to_json(result[1]))
-    submission_report = df_to_download(result[1])
-    await upload_to_storage(period_code, lei, str(submission.id) + REPORT_QUALIFIER, submission_report.encode("utf-8"))
-    await update_submission(submission)
+        await update_submission(submission)
+
+    except RuntimeError as re:
+        log.error("The file is malformed", re, exc_info=True, stack_info=True)
+        submission.state = SubmissionState.SUBMISSION_UPLOAD_MALFORMED
+        await update_submission(submission)
+        raise HTTPException(status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=re)
