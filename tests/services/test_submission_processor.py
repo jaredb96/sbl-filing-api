@@ -1,4 +1,6 @@
 import asyncio
+
+import pandas as pd
 import pytest
 
 from http import HTTPStatus
@@ -8,6 +10,8 @@ from unittest.mock import Mock, ANY, AsyncMock
 from pytest_mock import MockerFixture
 from sbl_filing_api.config import FsProtocol, settings
 from sbl_filing_api.entities.models.dao import SubmissionDAO, SubmissionState
+from regtech_data_validator.create_schemas import ValidationPhase
+from regtech_data_validator.checks import Severity
 from regtech_api_commons.api.exceptions import RegTechHttpException
 
 
@@ -113,7 +117,11 @@ class TestSubmissionProcessor:
         assert e.value.status_code == HTTPStatus.REQUEST_ENTITY_TOO_LARGE
 
     async def test_validate_and_update_successful(
-        self, mocker: MockerFixture, successful_submission_mock: Mock, df_to_json_mock: Mock, df_to_download_mock: Mock
+        self,
+        mocker: MockerFixture,
+        successful_submission_mock: Mock,
+        build_validation_results_mock: Mock,
+        df_to_download_mock: Mock,
     ):
         mock_sub = SubmissionDAO(
             id=1,
@@ -137,7 +145,11 @@ class TestSubmissionProcessor:
         assert successful_submission_mock.mock_calls[1].args[0].state == "VALIDATION_SUCCESSFUL"
 
     async def test_validate_and_update_warnings(
-        self, mocker: MockerFixture, warning_submission_mock: Mock, df_to_json_mock: Mock, df_to_download_mock: Mock
+        self,
+        mocker: MockerFixture,
+        warning_submission_mock: Mock,
+        build_validation_results_mock: Mock,
+        df_to_download_mock: Mock,
     ):
         mock_sub = SubmissionDAO(
             id=1,
@@ -160,7 +172,11 @@ class TestSubmissionProcessor:
         assert warning_submission_mock.mock_calls[1].args[0].state == "VALIDATION_WITH_WARNINGS"
 
     async def test_validate_and_update_errors(
-        self, mocker: MockerFixture, error_submission_mock: Mock, df_to_json_mock: Mock, df_to_download_mock: Mock
+        self,
+        mocker: MockerFixture,
+        error_submission_mock: Mock,
+        build_validation_results_mock: Mock,
+        df_to_download_mock: Mock,
     ):
         mock_sub = SubmissionDAO(
             id=1,
@@ -297,3 +313,181 @@ class TestSubmissionProcessor:
             exc_info=True,
             stack_info=True,
         )
+
+    async def test_build_validation_results_success(self):
+        result = (True, pd.DataFrame, ValidationPhase.LOGICAL.value)
+        validation_json = submission_processor.build_validation_results(result)
+        assert validation_json["syntax_errors"]["count"] == 0
+        assert validation_json["logic_errors"]["count"] == 0
+        assert validation_json["logic_warnings"]["count"] == 0
+
+    async def test_build_validation_results_syntax_errors(self):
+        result = (
+            False,
+            pd.DataFrame(
+                [
+                    [
+                        1,
+                        ValidationPhase.SYNTACTICAL.value,
+                        "TESTLEI1234567890123",
+                        "field_in_error",
+                        1,
+                        Severity.ERROR.value,
+                        "test_link",
+                        "VALID123",
+                        "validation_name_goes_here",
+                        "this is a val desc",
+                        "multi-field",
+                    ],
+                ],
+                columns=[
+                    "record_no",
+                    "validation_phase",
+                    "uid",
+                    "field_name",
+                    "field_value",
+                    "validation_severity",
+                    "fig_link",
+                    "validation_id",
+                    "validation_name",
+                    "validation_desc",
+                    "scope",
+                ],
+            ),
+            ValidationPhase.SYNTACTICAL.value,
+        )
+        validation_json = submission_processor.build_validation_results(result)
+        assert validation_json["syntax_errors"]["count"] > 0
+
+    async def test_build_validation_results_logic_warnings(self):
+        result = (
+            False,
+            pd.DataFrame(
+                [
+                    [
+                        1,
+                        ValidationPhase.LOGICAL.value,
+                        "TESTLEI1234567890123",
+                        "field_in_error",
+                        1,
+                        Severity.WARNING.value,
+                        "test_link",
+                        "VALID123",
+                        "validation_name_goes_here",
+                        "this is a val desc",
+                        "multi-field",
+                    ],
+                ],
+                columns=[
+                    "record_no",
+                    "validation_phase",
+                    "uid",
+                    "field_name",
+                    "field_value",
+                    "validation_severity",
+                    "fig_link",
+                    "validation_id",
+                    "validation_name",
+                    "validation_desc",
+                    "scope",
+                ],
+            ),
+            ValidationPhase.LOGICAL.value,
+        )
+        validation_json = submission_processor.build_validation_results(result)
+        assert validation_json["syntax_errors"]["count"] == 0
+        assert validation_json["logic_errors"]["count"] == 0
+        assert validation_json["logic_warnings"]["count"] > 0
+
+    async def test_build_validation_results_logic_errors(self):
+        result = (
+            False,
+            pd.DataFrame(
+                [
+                    [
+                        1,
+                        ValidationPhase.LOGICAL.value,
+                        "TESTLEI1234567890123",
+                        "field_in_error",
+                        1,
+                        Severity.ERROR.value,
+                        "test_link",
+                        "VALID123",
+                        "validation_name_goes_here",
+                        "this is a val desc",
+                        "multi-field",
+                    ],
+                ],
+                columns=[
+                    "record_no",
+                    "validation_phase",
+                    "uid",
+                    "field_name",
+                    "field_value",
+                    "validation_severity",
+                    "fig_link",
+                    "validation_id",
+                    "validation_name",
+                    "validation_desc",
+                    "scope",
+                ],
+            ),
+            ValidationPhase.LOGICAL.value,
+        )
+        validation_json = submission_processor.build_validation_results(result)
+        assert validation_json["syntax_errors"]["count"] == 0
+        assert validation_json["logic_errors"]["count"] > 0
+        assert validation_json["logic_warnings"]["count"] == 0
+
+    async def test_build_validation_results_logic_warnings_and_errors(self):
+        result = (
+            False,
+            pd.DataFrame(
+                [
+                    [
+                        1,
+                        ValidationPhase.LOGICAL.value,
+                        "TESTLEI1234567890123",
+                        "field_in_error",
+                        1,
+                        Severity.WARNING.value,
+                        "test_link",
+                        "VALID123",
+                        "validation_name_goes_here",
+                        "this is a val desc",
+                        "multi-field",
+                    ],
+                    [
+                        2,
+                        ValidationPhase.LOGICAL.value,
+                        "TESTLEI1234567890123",
+                        "field_in_error",
+                        1,
+                        Severity.ERROR.value,
+                        "test_link",
+                        "VALID234",
+                        "validation_name_goes_here",
+                        "this is a val desc",
+                        "multi-field",
+                    ],
+                ],
+                columns=[
+                    "record_no",
+                    "validation_phase",
+                    "uid",
+                    "field_name",
+                    "field_value",
+                    "validation_severity",
+                    "fig_link",
+                    "validation_id",
+                    "validation_name",
+                    "validation_desc",
+                    "scope",
+                ],
+            ),
+            ValidationPhase.LOGICAL.value,
+        )
+        validation_json = submission_processor.build_validation_results(result)
+        assert validation_json["syntax_errors"]["count"] == 0
+        assert validation_json["logic_errors"]["count"] > 0
+        assert validation_json["logic_warnings"]["count"] > 0
