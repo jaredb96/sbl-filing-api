@@ -1,9 +1,14 @@
+import asyncio
+
+from concurrent.futures import ProcessPoolExecutor
 from fastapi import Depends, Request, UploadFile, BackgroundTasks, status
 from fastapi.responses import Response, JSONResponse, FileResponse
+from multiprocessing import Manager
 from regtech_api_commons.api.router_wrapper import Router
 from regtech_api_commons.api.exceptions import RegTechHttpException
 from sbl_filing_api.entities.models.model_enums import UserActionType
 from sbl_filing_api.services import submission_processor
+from sbl_filing_api.services.multithread_handler import handle_submission, check_future
 from typing import Annotated, List
 
 from sbl_filing_api.entities.engine.engine import get_session
@@ -31,6 +36,7 @@ async def set_db(request: Request, session: Annotated[AsyncSession, Depends(get_
     request.state.db_session = session
 
 
+executor = ProcessPoolExecutor()
 router = Router(dependencies=[Depends(set_db), Depends(verify_user_lei_relation)])
 
 
@@ -46,7 +52,7 @@ async def get_filing(request: Request, response: Response, lei: str, period_code
     res = await repo.get_filing(request.state.db_session, lei, period_code)
     if res:
         return res
-    response.status_code = status.HTTP_404_NOT_FOUND
+    response.status_code = status.HTTP_204_NO_CONTENT
 
 
 @router.post("/institutions/{lei}/filings/{period_code}", response_model=FilingDTO)
@@ -161,16 +167,21 @@ async def upload_file(
             )
 
             submission.state = SubmissionState.SUBMISSION_UPLOADED
-            submission = await repo.update_submission(submission)
+            submission = await repo.update_submission(request.state.db_session, submission)
         except Exception as e:
             submission.state = SubmissionState.UPLOAD_FAILED
-            submission = await repo.update_submission(submission)
+            submission = await repo.update_submission(request.state.db_session, submission)
             raise RegTechHttpException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 name="Submission Unprocessable",
                 detail=f"Error while trying to process Submission {submission.id}",
             ) from e
-        background_tasks.add_task(submission_processor.validation_monitor, period_code, lei, submission, content)
+
+        exec_check = Manager().dict()
+        exec_check["continue"] = True
+        loop = asyncio.get_event_loop()
+        future = loop.run_in_executor(executor, handle_submission, period_code, lei, submission, content, exec_check)
+        background_tasks.add_task(check_future, future, submission.id, exec_check)
 
         return submission
 
@@ -236,7 +247,7 @@ async def accept_submission(request: Request, id: int, lei: str, period_code: st
 
     submission.accepter_id = accepter.id
     submission.state = SubmissionState.SUBMISSION_ACCEPTED
-    submission = await repo.update_submission(submission, request.state.db_session)
+    submission = await repo.update_submission(request.state.db_session, submission)
     return submission
 
 
