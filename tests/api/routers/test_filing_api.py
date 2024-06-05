@@ -981,6 +981,7 @@ class TestFilingApi:
         assert res.text == "Test"
         assert res.headers["content-type"] == "text/csv; charset=utf-8"
         assert res.headers["content-disposition"] == 'attachment; filename="1_validation_report.csv"'
+        assert res.headers["Cache-Control"] == "no-store"
 
         sub_mock.return_value = []
         client = TestClient(app_fixture)
@@ -1025,6 +1026,7 @@ class TestFilingApi:
         assert res.text == "Test"
         assert res.headers["content-type"] == "text/csv; charset=utf-8"
         assert res.headers["content-disposition"] == 'attachment; filename="2_validation_report.csv"'
+        assert res.headers["Cache-Control"] == "no-store"
 
         sub_mock.return_value = []
         client = TestClient(app_fixture)
