@@ -73,11 +73,12 @@ async def post_filing(request: Request, lei: str, period_code: str):
                 user_email=request.user.email,
                 action_type=UserActionType.CREATE,
             )
-        except Exception as e:
-            # logger.error("Error while trying to process CREATE User Action", e)
-            return JSONResponse(
+        except Exception:
+            logger.exception("Error while trying to create the filing.creator UserAction.")
+            raise RegTechHttpException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content=f"{e}",
+                name="Filing.creator UserAction error",
+                detail="Error while trying to create the filing.creator UserAction.",
             )
 
         try:
